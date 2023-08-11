@@ -51,6 +51,8 @@ risk_subset <- function(df, birdCol, shipCol, region_name){
                      ifelse(oneBird$class_bird == 2 & oneBird$class_ship == 2, "high",
                      ifelse(oneBird$class_bird == 3 & oneBird$class_ship == 3, "veryhigh", NA))))))
   
+  oneBird$risk_cat <- factor(oneBird$risk_cat,
+                          levels = c("low", "mediumBIRD", "mediumSHIP", "high", "veryhigh"))
   # Evaluate continuous risk 
   oneBird$quant_bird <- ecdf(oneBird$density)(oneBird$density)
   # BirdVal99 <- min(oneBird$density[which(oneBird$QuantBird > 0.99)])
@@ -83,8 +85,10 @@ risk_subset <- function(df, birdCol, shipCol, region_name){
   return(tnew)
 }
 
-prep_region_hexes <- function(study_area, hex){
+prep_region_hexes <- function(study_area, hex, fullDf){
   shpFile <- st_read(paste0("./data_raw/study_areas/", study_area), quiet=TRUE)
-  studyHex <- hex[st_intersects(hex, shpFile, sparse=FALSE),]
+  inBounds <- hex[st_intersects(hex, shpFile, sparse=FALSE),]
+  studyHex <- inBounds[inBounds$hex_id %in% unique(fullDf$hex_id),]
+  
   return(studyHex)
 }
