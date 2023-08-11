@@ -44,7 +44,7 @@ Describe the data sources used by the scripts. Include details about data format
 
 List and briefly explain the main scripts included in the repository. Provide a high-level overview of what each script does and how it contributes to the project's goals.
 
-<iframe src="widgets/visnetwork_widget.html" width="800" height="600"></iframe>
+<iframe src="./widgets/visnetwork_widget.html" width="800" height="600"></iframe>
 
 1. **data_preprocessing.R**: This script handles the preprocessing of raw vessel and seabird data. It combines, cleans, and organizes the datasets into a format suitable for analysis.
 
