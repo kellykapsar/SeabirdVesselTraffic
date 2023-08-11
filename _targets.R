@@ -3,6 +3,7 @@ library(tarchetypes, quietly = TRUE)
 library(tidyverse, quietly = TRUE)
 library(sf, quietly = TRUE)
 library(metR, quietly = TRUE)
+library(ggpubr, quietly=TRUE)
 # This is an example _targets.R file. Every
 # {targets} pipeline needs one.
 # Use tar_script() to create _targets.R and tar_edit()
@@ -18,7 +19,7 @@ sapply(scripts, source)
 
 
 # Set target-specific options such as packages:
-tar_option_set(packages = c("tidyverse", "sf", "metR"), 
+tar_option_set(packages = c("tidyverse", "sf", "metR", "ggpubr"), 
                error = "null")
 
 ##########################################
@@ -54,25 +55,6 @@ traffDat <- read.csv("./data_processed/traffic_data/traffic_clean.csv")
 allSpp <- read.csv("./data_raw/NPPSD_Bird_Codes_Only_Revised.csv")
 
 
-#########################################
-# inits <- list(tar_target(studyTransects, 
-#                     get_study_area_transects(loc=loc,
-#                                              hex=hex)), 
-#          tar_target(birdDat, 
-#                     multi_taxa_hex_density(obs=obs, 
-#                                            transectsIn = studyTransects,
-#                                            taxaDf = allSpp)))
-# joins <- tar_target(fullDf, 
-#                     left_join(birdDat, traffDat))
-# writeDf <- tar_target(test, 
-#                     write.csv(fullDf, 
-#                               file = "./data_processed/full_df.csv", 
-#                               row.names = FALSE))
-# # NEED TO GET CALCULATE_RISK FUNCTION WORKING IN A MAPPED TARGET 
-# # ...ONE NESTED DF FOR EACH STUDY AREA... 
-# testtar <- tar_target(riskDf, 
-#                       calculate_risk(df = fullDf, shpfile = hex, region_name = "all-ak"))
-# 
 
 inits <- list(tar_target(studyTransects, 
                get_study_area_transects(loc=loc,
@@ -91,11 +73,22 @@ inits <- list(tar_target(studyTransects,
 mapped_pipeline <- tar_map(
   values = params,
   names = "name",
-  tar_target(studyHexes, prep_region_hexes(study_area, hex)),
-  tar_target(riskDfs, calculate_risk(df = fullDf, shpfile = studyHexes, region_name = name)))
+  unlist = FALSE,
+  tar_target(studyHexes, prep_region_hexes(study_area, hex, fullDf)),
+  tar_target(riskDfs, calculate_risk(df = fullDf, shpfile = studyHexes, region_name = name)), 
+  tar_target(box, st_as_sf(name="boundary", st_buffer(st_as_sfc(st_bbox(studyHexes)), 10000))),
+  tar_target(basemapnew, st_crop(basemap, box)),
+  tar_target(catPlots, plot_risk_cat(riskDfs, region_name = name, studyHexes, basemapnew, box)), 
+  tar_target(conPlots, plot_risk_con(riskDfs, region_name = name, studyHexes, basemapnew, box)), 
+  tar_target(traffPlots, plot_traff(riskDfs, region_name = name, studyHexes, basemapnew, box)), 
+  tar_target(regionSummary, region_summary_table(fullDf, riskDfs, region_title = title)),
+  tar_target(riskSummary, risk_summary_table(riskDfs, region_title = title))) 
+
+out_regions <- tar_combine(allRegions, mapped_pipeline[["regionSummary"]], command=bind_rows(!!!.x))
+out_risk <- tar_combine(allRisk, mapped_pipeline[["riskSummary"]], command=bind_rows(!!!.x))
 
 # list(inits)
-list(inits, mapped_pipeline)
+list(inits, mapped_pipeline, out_regions, out_risk)
 
 # tar_validate() = make sure pipeline is ready to use
 # tar_make() = run pipeline
