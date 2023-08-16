@@ -63,7 +63,21 @@ R/
   3a_plot_results.R         Create plots of seabird density, vessel activity, and risk. 
   3b_results_tables.R       Create summary tables of seabird density, vessel activity, and risk statistics. 
 
+<<<<<<< HEAD
 ```
+=======
+<div>
+<iframe src="widgets/visnetwork_widget.html" width="800" height="600"></iframe>
+</div>
+
+1. **data_preprocessing.R**: This script handles the preprocessing of raw vessel and seabird data. It combines, cleans, and organizes the datasets into a format suitable for analysis.
+
+2. **vessel_density_analysis.R**: Analyzes vessel density patterns across different seasons using spatial analysis techniques. Generates density maps and statistics.
+
+3. **seabird_distribution_analysis.R**: Examines the distribution of seabird populations during different times of the year. Produces visualizations illustrating their movement patterns.
+
+4. **risk_evaluation.R**: Integrates vessel density and seabird distribution data to calculate and visualize the risk of interactions. Highlights areas of concern and suggests mitigation strategies.
+>>>>>>> df8c75faeb6c14e7e10d0efdf6e91b6b9cdbab51
 
 ## Results
 
