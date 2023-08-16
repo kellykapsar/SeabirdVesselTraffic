@@ -43,7 +43,7 @@ This project is run using an automated workflow using the [Targets](https://book
 
 So long as you have all the proper data inputs (see [Data section](#data) below), running the entire analysis requires only typing `tar_make()` into your R console.  
 
-To view an interactive image of the workflow, check out [this diagram]("./images/tar_network.html") rendered using the command `tar_visnetwork`. 
+To view an interactive image of the workflow, check out [this diagram](./images/tar_network.html) rendered using the command `tar_visnetwork`. 
 
 ## Data
 
