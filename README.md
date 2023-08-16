@@ -39,9 +39,11 @@ So long as you have git installed on your computer, generating a copy of this re
 
 ## Usage
 
-This project is run using an automated workflow using the [Targets](https://books.ropensci.org/targets/) package. The Targets package is a Make-like tool that generates a workflow pipeline for a given analysis. Each step in the analysis is saved in the form of a `tar_target`. Behind the scenes, the package keeps track of the inputs and outputs of each `tar_target` and increases the speed and efficiency of data analysis by only rerunning targets when you make a change to an upstream portion of the script.
+This project is run using an automated workflow using the [Targets](https://books.ropensci.org/targets/) package. The Targets package is a Make-like tool that generates a workflow pipeline for a given analysis. Each step in the analysis is saved in the form of a `tar_target`. Behind the scenes, the package keeps track of the inputs and outputs of each `tar_target` and increases the speed and efficiency of data analysis by only rerunning targets when you make a change to an upstream portion of the script.  
 
-So long as you have all the proper data inputs (see [Data section](#data) below), running the entire analysis requires only typing `tar_make()` into your R console. 
+So long as you have all the proper data inputs (see [Data section](#data) below), running the entire analysis requires only typing `tar_make()` into your R console.  
+
+To view an interactive image of the workflow, check out [this diagram]("./images/tar_network.html") rendered using the command `tar_visnetwork`. 
 
 ## Data
 
