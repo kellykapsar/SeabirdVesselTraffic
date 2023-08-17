@@ -117,6 +117,14 @@ mapped_pipeline <- tar_map(
                                      basemap = basemapnew, 
                                      box = box)), 
   
+  # Create and save seabird density  maps 
+  tar_target(birdPlots, 
+             command = plot_bird(nestDf = riskDfs, 
+                                  region_name = name, 
+                                  hex = studyHexes, 
+                                  basemap = basemapnew, 
+                                  box = box)), 
+  
   # Create and save vessel traffic  maps 
   tar_target(traffPlots, 
              command = plot_traff(nestDf = riskDfs, 

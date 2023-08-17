@@ -34,6 +34,7 @@ save_combo_plot <- function(summCol, fallCol, taxaLab, plotName, region_name){
                 width=10, height=6, units="in"))
 }
 
+
 #' Create an empty plot.
 #'
 #' This function generates an empty plot with specified background elements.
@@ -51,6 +52,7 @@ plot_empty <- function(basemap, box){
     plottheme
   return(plt)
 }
+
 
 #' Define the plot theme.
 #'
@@ -74,6 +76,7 @@ plot_theme <- function(){
   return(plottheme)
 }
 
+
 #' Generate a color palette.
 #'
 #' This function generates a color palette for plotting.
@@ -84,6 +87,7 @@ generate_color_palette <- function(){
             colorRampPalette(c("#eec73a", "#e29421", "#e29421", "#f05336","#ce472e"), bias=2)(25))
   return(cols)
 }
+
 
 #' Plot vessel traffic.
 #'
@@ -103,6 +107,7 @@ plot_traff <- function(nestDf, region_name, hex, basemap, box){
   
   save_combo_plot(summCol, fallCol, NA, plotName, region_name)
 }
+
 
 #' Plot vessel traffic.
 #'
@@ -146,6 +151,80 @@ traff_plot <- function(df, region_name, hex, title, basemap, box){
   return(plt)
 }
 
+
+#' Plot seabird density.
+#'
+#' This function saves a seasonal seabird density map a given region.
+#'
+#' @param nestDf Nested data frame containing seasonal risk data for each unique taxa and vessel activity metric combination.
+#' @param region_name Name of the region being analyzed.
+#' @param hex Hexagon data.
+#' @param basemap Sf object containing basemap for a given region. 
+#' @param box Bounding box object delineating boundaries of a given region.
+#' @return None.
+plot_bird <- function(nestDf, region_name, hex, basemap, box){
+  
+  nestDf$plotName <- paste0("./figures/density_", nestDf$taxa ,"_", region_name, ".png")
+  
+  # Remove rows with duplicate taxa, but differentvessel traffic rows
+  nestDfnew <- nestDf[!duplicated(nestDf$taxa),] 
+  
+  nestDfnew <- nestDfnew %>% mutate(summBird = map(summer, ~bird_plot(.x, 
+                                                                   hex = hex, 
+                                                                   title = "Summer", 
+                                                                   basemap = basemap, 
+                                                                   box = box)), 
+                              fallBird = map(fall, ~bird_plot(.x, 
+                                                                 hex = hex, 
+                                                                 title = "Fall", 
+                                                                 basemap = basemap, 
+                                                                 box = box)))
+  
+  apply(nestDfnew, 1, function(x){save_combo_plot(summCol = x$summBird, 
+                                               fallCol = x$fallBird, 
+                                               taxaLab = x$taxa,
+                                               plotName = x$plotName, 
+                                               region_name = region_name)})  
+}
+
+
+#' Plot seabird density.
+#'
+#' This function plots seabird density for a given data frame.
+#'
+#' @param df Individual risk data frame for one season and one bird density/vessel activity metric combo
+#' @param hex Hexagon data.
+#' @param title Character string with title for plot.
+#' @param basemap Sf object containing basemap for a given region. 
+#' @param box Bounding box object delineating boundaries of a given region.
+#' @return None.
+bird_plot <- function(df, hex, title, basemap, box){
+
+  cols <- generate_color_palette()
+  
+  dfSf <- hex %>% filter(hex_id %in% unique(df$hex_id)) %>% left_join(df, by="hex_id")
+  
+  pltEmpty <- plot_empty(basemap, box)
+  plt <- pltEmpty  + 
+    geom_sf(data=filter(dfSf, density == 0), color="darkgray", fill=NA) +
+    geom_sf(data=filter(dfSf, density != 0),aes(fill = density), color="darkgray") +
+    scale_fill_gradientn(colours=cols, trans="log10", labels=scales::label_number(),name="Density \n(Ind'ls/km\u00b2)", na.value="white") +
+    # scale_fill_steps(trans="log",low = "yellow", high = "red",nice.breaks=TRUE, labels=scales::label_number(), 
+    #                  name="Density \n(Ind'ls/km\u00b2)", guide = guide_coloursteps(show.limits = TRUE)) + 
+    scale_x_continuous(expand = c(0, 0)) +
+    scale_y_continuous(expand = c(0, 0)) +
+    # labs(caption = paste0("*Empty hexes were surveyed, but no ", taxaLabel, " were sighted during study period.")) + 
+    guides(fill = guide_colourbar(barwidth = 25, 
+                                  barheight = 1, 
+                                  title.hjust = 0.5,
+                                  ticks.colour="black", 
+                                  frame.colour = "black", 
+                                  ticks.linewidth = 0.75)) +
+    ggtitle(title)
+  return(plt)
+}
+
+
 #' Plot risk category.
 #'
 #' This function saves a series of seasonal categorical risk maps for all unique taxa and vessel activity metric combination.
@@ -178,6 +257,7 @@ plot_risk_cat <- function(nestDf, region_name, hex, basemap, box){
                                                region_name = region_name)})  
   
 }
+
 
 #' Plot risk category.
 #'
@@ -212,6 +292,7 @@ risk_cat_plot <- function(df, hex, title, basemap, box){
   return(plt)
 }
 
+
 #' Plot continuous risk.
 #'
 #' This function saves a series of seasonal continuous risk maps for each unique taxa and vessel activity metric combination.
@@ -244,6 +325,7 @@ plot_risk_con <- function(nestDf, region_name, hex, basemap, box){
                                                region_name = region_name)})  
   
 }
+
 
 #' Plot continuous risk.
 #'
