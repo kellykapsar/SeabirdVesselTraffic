@@ -1,3 +1,11 @@
+#' Create a summary table for region statistics.
+#'
+#' This function generates a summary table for region statistics based on provided data.
+#'
+#' @param fullDf Output from calculate_risk function. Data frame containing bird and vessel traffic data.  
+#' @param nestDf f Nested data frame containing seasonal risk data for each unique taxa and vessel activity metric combination.
+#' @param region_title Title of the region.
+#' @return A summary table for region statistics.
 region_summary_table <- function(fullDf, nestDf, region_title){
   subDf <- fullDf[fullDf$hex_id %in% nestDf$fall[[1]]$hex_id,]
   tb <- subDf %>% group_by(season) %>% summarize(n_hexes = length(unique(subDf$hex_id)),
@@ -16,6 +24,13 @@ region_summary_table <- function(fullDf, nestDf, region_title){
   # tb %>% tab_pivot()
 }
 
+#' Create a summary table for risk statistics.
+#'
+#' This function generates a summary table for risk statistics based on nested data.
+#'
+#' @param nestDf Nested data frame containing seasonal risk data for each unique taxa and vessel activity metric combination.
+#' @param region_title Title of the region.
+#' @return A summary table for risk statistics.
 risk_summary_table <- function(nestDf, region_title){
   t <- nestDf %>% 
     mutate(region = region_title,
@@ -29,7 +44,7 @@ risk_summary_table <- function(nestDf, region_title){
            sd_risk_fall = round(map_dbl(fall, ~sd(.$risk_cont)),2),
            max_risk_summ = round(map_dbl(summer, ~max(.$risk_cont)),2),
            max_risk_fall = round(map_dbl(fall, ~max(.$risk_cont)),2)
-          ) %>% 
+    ) %>% 
     select(-fall, -summer)
   return(t)
 }

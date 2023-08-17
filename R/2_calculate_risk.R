@@ -1,4 +1,12 @@
-
+#' Calculate risk levels based on density and vessel traffic.
+#'
+#' This function calculates risk levels for all combinations of unique taxa groups and vessel activity metrics 
+#' within a given region. 
+#'
+#' @param df Data frame containing bird and vessel traffic data .
+#' @param shpfile Shapefile containing geometries and hex_ids of hexes with sufficient survey effort in a given region
+#' @param region_name Name of the region being analyzed.
+#' @return A data frame containing risk level calculations.
 calculate_risk <- function(df, shpfile, region_name){
   
   # Excluded hexes outside of study area 
@@ -23,6 +31,15 @@ calculate_risk <- function(df, shpfile, region_name){
   return(nestDf)
 }
 
+#' Calculate risk subset.
+#'
+#' This function calculates categorical and continuous measures of risk fora given taxa and  metric of vessel activity.
+#'
+#' @param df Data frame containing bird and vessel traffic data.
+#' @param birdCol Column name containing density for a particular taxa group.
+#' @param shipCol Column name containing vessel activity metric.
+#' @param region_name Name of the region being analyzed.
+#' @return A data frame containing calculated risk subset.
 risk_subset <- function(df, birdCol, shipCol, region_name){
   
   oneBird <- df %>% 
@@ -75,6 +92,11 @@ risk_subset <- function(df, birdCol, shipCol, region_name){
                      sub("_", "-", {{birdCol}}), "_", 
                      sub("_", "-", {{shipCol}}), "_", 
                      sub("_", "-", region_name), ".csv")
+  
+  if(!file.exists("./data_processed")){
+    dir.create("./data_processed")
+  }
+  
   write.csv(oneBird, filename , row.names=FALSE)
   
   oneBird$taxa <- as.character({{birdCol}})
@@ -85,6 +107,14 @@ risk_subset <- function(df, birdCol, shipCol, region_name){
   return(tnew)
 }
 
+#' Prepare region hexagons.
+#'
+#' This function isolates hexes within a given region that have sufficient survey effort for inclusion in the study. 
+#'
+#' @param study_area File name of the study area bounding box shapefile.
+#' @param hex hex_x_ocean.shp hex polygon shapefile delineating study area boundaries
+#' @param fullDf Data frame containing vessel activity and seabird density measurements for a particular region 
+#' @return A data frame of hexagons within the study area.
 prep_region_hexes <- function(study_area, hex, fullDf){
   shpFile <- st_read(paste0("./data_raw/study_areas/", study_area), quiet=TRUE)
   inBounds <- hex[st_intersects(hex, shpFile, sparse=FALSE),]

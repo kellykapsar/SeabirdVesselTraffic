@@ -1,4 +1,14 @@
 
+#' Save a combined plot.
+#'
+#' This function creates and saves a combined plot of two seasonal subplots.
+#'
+#' @param summCol Summer subplot.
+#' @param fallCol Fall subplot.
+#' @param taxaLab Taxa label for the plot.
+#' @param plotName Name of the saved plot file.
+#' @param region_name Name of the region being analyzed.
+#' @return None.
 save_combo_plot <- function(summCol, fallCol, taxaLab, plotName, region_name){
   
   comboplot <- ggarrange(summCol, fallCol, ncol=2, nrow=1, common.legend=TRUE, legend = "bottom")
@@ -9,6 +19,11 @@ save_combo_plot <- function(summCol, fallCol, taxaLab, plotName, region_name){
     comboplot <- annotate_figure(comboplot, top = text_grob(snake_to_label(taxaLab), face = "bold", size = 30)) +
       theme(panel.background = element_rect(fill = "white"))
   }
+  
+  if(!file.exists("./figures")){
+    dir.create("./figures")
+  }
+  
   # Save figure
   ifelse(region_name == "aleut",
          ggsave(filename=plotName,
@@ -19,6 +34,13 @@ save_combo_plot <- function(summCol, fallCol, taxaLab, plotName, region_name){
                 width=10, height=6, units="in"))
 }
 
+#' Create an empty plot.
+#'
+#' This function generates an empty plot with specified background elements.
+#'
+#' @param basemap Sf object containing basemap for a given region. 
+#' @param box Bounding box object delineating boundaries of a given region.
+#' @return The empty plot.
 plot_empty <- function(basemap, box){
   
   plottheme <- plot_theme()
@@ -30,6 +52,11 @@ plot_empty <- function(basemap, box){
   return(plt)
 }
 
+#' Define the plot theme.
+#'
+#' This function returns a predefined plot theme.
+#'
+#' @return A list of theme elements for the plot.
 plot_theme <- function(){
   plottheme <- list(
     scale_x_longitude(ticks = 5, expand = c(0, 0)),
@@ -47,12 +74,27 @@ plot_theme <- function(){
   return(plottheme)
 }
 
+#' Generate a color palette.
+#'
+#' This function generates a color palette for plotting.
+#'
+#' @return A color palette.
 generate_color_palette <- function(){
   cols <- c(colorRampPalette(c("#e7f0fa", "#c9e2f6", "#95cbee", "#0099dc", "#4ab04a", "#ffd73e"))(25),
             colorRampPalette(c("#eec73a", "#e29421", "#e29421", "#f05336","#ce472e"), bias=2)(25))
   return(cols)
 }
 
+#' Plot vessel traffic.
+#'
+#' This function saves a seasonal vessel activity map a given region.
+#'
+#' @param nestDf Nested data frame containing seasonal risk data for each unique taxa and vessel activity metric combination.
+#' @param region_name Name of the region being analyzed.
+#' @param hex Hexagon data.
+#' @param basemap Sf object containing basemap for a given region. 
+#' @param box Bounding box object delineating boundaries of a given region.
+#' @return None.
 plot_traff <- function(nestDf, region_name, hex, basemap, box){
   plotName <- paste0("./figures/traff_", nestDf$traff[1] ,"_", region_name, ".png")
   
@@ -62,6 +104,17 @@ plot_traff <- function(nestDf, region_name, hex, basemap, box){
   save_combo_plot(summCol, fallCol, NA, plotName, region_name)
 }
 
+#' Plot vessel traffic.
+#'
+#' This function plots vessel traffic for a given data frame.
+#'
+#' @param df Individual risk data frame for one season and one bird density/vessel activity metric combo
+#' @param region_name Name of the region being analyzed.
+#' @param hex Hexagon data.
+#' @param title Character string with title for plot.
+#' @param basemap Sf object containing basemap for a given region. 
+#' @param box Bounding box object delineating boundaries of a given region.
+#' @return None.
 traff_plot <- function(df, region_name, hex, title, basemap, box){
 
   if(region_name != "nbs-cs"){
@@ -93,6 +146,16 @@ traff_plot <- function(df, region_name, hex, title, basemap, box){
   return(plt)
 }
 
+#' Plot risk category.
+#'
+#' This function saves a series of seasonal categorical risk maps for all unique taxa and vessel activity metric combination.
+#'
+#' @param nestDf Nested data frame containing seasonal risk data nested within rows of each unique taxa and vessel activity metric combination..
+#' @param region_name Name of the region being analyzed.
+#' @param hex Hexagon data.
+#' @param basemap Sf object containing basemap for a given region. 
+#' @param box Bounding box object delineating boundaries of a given region.
+#' @return None.
 plot_risk_cat <- function(nestDf, region_name, hex, basemap, box){
   nestDf$plot_name <- paste0("./figures/risk-cat_", nestDf$traff ,"_", nestDf$taxa, "_", region_name, ".png")
   
@@ -116,6 +179,16 @@ plot_risk_cat <- function(nestDf, region_name, hex, basemap, box){
   
 }
 
+#' Plot risk category.
+#'
+#' This function creates a categorical risk map for a single taxa and vessel activity metric combination.
+#'
+#' @param df Individual risk data frame for one season and one bird density/vessel activity metric combo
+#' @param hex Hexagon data.
+#' @param title Title of the plot.
+#' @param basemap Sf object containing basemap for a given region. 
+#' @param box Bounding box object delineating boundaries of a given region.
+#' @return The risk category plot.
 risk_cat_plot <- function(df, hex, title, basemap, box){
   
   plottheme <- plot_theme()
@@ -139,6 +212,16 @@ risk_cat_plot <- function(df, hex, title, basemap, box){
   return(plt)
 }
 
+#' Plot continuous risk.
+#'
+#' This function saves a series of seasonal continuous risk maps for each unique taxa and vessel activity metric combination.
+#'
+#' @param nestDf Nested data frame containing seasonal risk data for each unique taxa and vessel activity metric combination.
+#' @param region_name Name of the region being analyzed.
+#' @param hex Hexagon data.
+#' @param basemap Sf object containing basemap for a given region. 
+#' @param box Bounding box object delineating boundaries of a given region.
+#' @return None.
 plot_risk_con <- function(nestDf, region_name, hex, basemap, box){
   nestDf$plot_name <- paste0("./figures/risk-con_", nestDf$traff ,"_", nestDf$taxa, "_", region_name, ".png")
   
@@ -162,6 +245,16 @@ plot_risk_con <- function(nestDf, region_name, hex, basemap, box){
   
 }
 
+#' Plot continuous risk.
+#'
+#' This function creates a continuous risk map for a single taxa and vessel activity metric combination.
+#'
+#' @param df Individual risk data frame for one season and one bird density/vessel activity metric combo
+#' @param hex Output of prep_regional_hexes. An sf object containing geometries of hexes with sufficient survey effort for inclusion in the study. 
+#' @param title Title of the plot.
+#' @param basemap Sf object containing basemap for a given region. 
+#' @param box Bounding box object delineating boundaries of a given region.
+#' @return The continuous risk plot.
 risk_con_plot <- function(df, hex, title, basemap, box){
   
   plottheme <- plot_theme()
