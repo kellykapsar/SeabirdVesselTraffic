@@ -14,7 +14,7 @@ tar_option_set(packages = c("tidyverse", "sf", "metR", "ggpubr"),
                error = "null")
 
 
-# Load in files from desktop ----------------------------------------------
+# Load in files from desktop ---------------------------------------------------
 # Hexagon polys
 hex <- st_read("./data_raw/hex_x_ocean/hex_x_ocean.shp", quiet = TRUE) %>% 
   select(hexID) %>%
@@ -32,7 +32,7 @@ obs <- read.csv("./data_raw/NPPSD_v4.0/Observations_NPPSDv4.csv")
 traffDat <- read.csv("./data_processed/traffic_data/traffic_clean.csv")
 
 
-# Specify regional subets and taxa groups for analysis  ----------------------------------------------
+# Specify regional subets and taxa groups for analysis  ------------------------
 regions <- data.frame(
   study_area = c("AllAlaska.shp", "BerChukBeau.shp", "KodiakPWS.shp", "Unimak.shp"),
   name = c("all-ak","nbs-cs", "goa", "aleut"), 
@@ -44,19 +44,30 @@ regions <- data.frame(
 allSpp <- read.csv("./data_raw/NPPSD_Bird_Codes_Only_Revised.csv")
 
 
-# Initial data cleaning and organization targets ----------------------------------------------
+# Initial data cleaning and organization targets -------------------------------
 
 inits <- list(
   
+  # Aggregate traffic data 
+  tar_target(traffDat, 
+             command = prep_traff(fileDir = "D:/AIS_V2_DayNight_60km6hrgap/Hex_DayNight_Hours/")),
+  
+  # Clean transects
   tar_target(studyTransects, 
              command = get_study_area_transects(loc=loc,
-                                      hex=hex)), 
+                                                hex=hex)), 
+  
+  # Remove off transect, out of study area, and outside of study period observations
   tar_target(birdDat, 
              command = multi_taxa_hex_density(obs=obs, 
                                               transectsIn = studyTransects,
                                               taxaDf = allSpp)),
+  
+  # Generate complete dataframe of vessel activity and seabird density in each hex 
   tar_target(fullDf, 
              command = left_join(birdDat, traffDat)),
+  
+  # Save data frame
   tar_target(test,
              command = write.csv(fullDf,
                                  file = "./data_processed/full_df.csv",
@@ -64,7 +75,7 @@ inits <- list(
   )
 
 
-# Mapped pipeline applies each target to each region ----------------------------------------------
+# Mapped pipeline applies each target to each region ---------------------------
 mapped_pipeline <- tar_map(
   values = regions,
   names = "name",
@@ -77,13 +88,13 @@ mapped_pipeline <- tar_map(
   # Calculate categorical and continuous risk values 
   tar_target(riskDfs, 
              command = calculate_risk(df = fullDf, 
-                                      hex = studyHexes, 
+                                      shpfile = studyHexes, 
                                       region_name = name)), 
   
   # Create bounding box for plotting
   tar_target(box, 
-             command = st_as_sf(x = st_buffer(st_as_sfc(st_bbox(studyHexes)), 10000)),
-             name = "boundary"),
+             command = st_as_sf(st_buffer(st_as_sfc(st_bbox(studyHexes)), 10000),
+             name = "boundary")),
   
   # Crop basemape to region for plotting
   tar_target(basemapnew, 
@@ -125,7 +136,7 @@ mapped_pipeline <- tar_map(
              command = risk_summary_table(nestDf = riskDfs, 
                                           region_title = title))) 
 
-# Combine regional results  ----------------------------------------------
+# Combine regional results  ----------------------------------------------------
 
 # Combine regional summary tables into master table
 out_regions <- tar_combine(allRegions, 
@@ -143,7 +154,7 @@ list(inits, mapped_pipeline, out_regions, out_risk)
 
 
 ################################################################################
-# Dumpster Zone (aka reminders and broken code)  ----------------------------------------------
+# Dumpster Zone (aka reminders and broken code)  -------------------------------
 
 # tar_validate() = make sure pipeline is ready to use
 # tar_make() = run pipeline

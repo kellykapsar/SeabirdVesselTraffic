@@ -128,6 +128,7 @@ multi_taxa_hex_density <- function(obs, transectsIn, taxaDf, startYear = 2006) {
 #' taxa_list <- c("taxa1", "taxa2")
 #' hex_density <- get_hex_density(obs, transects, taxa_list, startYear = 2010)
 get_hex_density <- function(obs, transectsIn, taxaList, startYear = 2006) {
+  
   taxa <- unlist(taxaList)
   taxaLab <- label_to_snake(names(taxaList))
   
@@ -175,6 +176,8 @@ get_hex_density <- function(obs, transectsIn, taxaList, startYear = 2006) {
 #' @import dplyr purrr tidyr sf
 #' @examples
 #' traffic_data <- prep_traff("traffic_files/")
+#' 
+#' 
 prep_traff <- function(fileDir) {
   fileList <- list.files(fileDir, pattern = ".shp")
   # Isolate month values of interest from file names
@@ -182,15 +185,20 @@ prep_traff <- function(fileDir) {
   
   # Read in data
   temp <- lapply(hexes, function(x) {
-    st_read(paste0(hexdir, x), quiet = TRUE) %>%
+    st_read(paste0(fileDir, x), quiet = TRUE) %>%
       st_drop_geometry()
   })
   
   hexAll <- do.call(rbind, temp)
+  
+  hexAll$month <- as.numeric(hexAll$month)
+  hexAll$season <- ifelse(hexAll$month %in% 6:8, "summer", 
+                   ifelse(hexAll$month %in% 9:11, "fall", NA))
+  
   cols <- c("N_Hrs_Al", "Hrs_Al", "D_Hrs_Al")
   
   dfs <- lapply(cols, clean_traff_subsets, df = hexAll)
-  t <- reduce(dfs, inner_join, by = "hex_id")
+  t <- reduce(dfs, inner_join, by = c("hex_id", "season"))
   
   return(t)
 }
@@ -208,7 +216,7 @@ prep_traff <- function(fileDir) {
 #' cleaned_data <- clean_traff_subsets(traffic_data, "N_Hrs_Al")
 clean_traff_subsets <- function(df, colName) {
   temp <- df %>%
-    dplyr::select(colName, hexID) %>%
+    dplyr::select(colName, hexID, season) %>%
     rename(hex_id = hexID)
   
   # Replace NA values with zero
@@ -219,7 +227,7 @@ clean_traff_subsets <- function(df, colName) {
   
   # NEED TO ADD SEASONAL CALCS HERE...
   hexRes <- temp %>%
-    group_by(hex_id) %>%
+    group_by(hex_id, season) %>%
     summarise(new_col = sum(!!sym(colName))) %>%
     rename({{newColName}} := new_col)
 }
