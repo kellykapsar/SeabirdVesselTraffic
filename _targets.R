@@ -146,7 +146,13 @@ mapped_pipeline <- tar_map(
   
   tar_target(taxaBarGraph, 
              command = bar_graph_taxa(df = riskSummary,
-                                      region_name = name))) 
+                                      region_name = name)), 
+  tar_target(jointRiskMap, 
+             command = plot_joint_high_risk(nestDf = riskDfs, 
+                                            region_name = name, 
+                                            hex = studyHexes, 
+                                            basemap = basemapnew, 
+                                            box = box))) 
 
 # Combine regional results  ----------------------------------------------------
 

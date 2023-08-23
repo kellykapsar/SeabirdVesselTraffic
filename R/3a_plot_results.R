@@ -383,3 +383,82 @@ risk_con_plot <- function(df, hex, title, basemap, box){
 }
 
 
+#' Create a joint plot of high-risk taxa counts.
+#'
+#' This function saves a map of the total number of high risk taxa groups per hex within a region.
+#'
+#' @param nestDf Nested data frame containing seasonal risk data for each unique taxa and vessel activity metric combination.
+#' @param region_name Name of the region being analyzed.
+#' @param hex Output of prep_regional_hexes. An sf object containing geometries of hexes with sufficient survey effort for inclusion in the study. 
+#' @param basemap Sf object containing basemap for a given region. 
+#' @param box Bounding box object delineating boundaries of a given region.
+#' @return A joint plot of high-risk taxa counts.
+plot_joint_high_risk <- function(nestDf, region_name, hex, basemap, box){
+  summ <- format_risk_totals(nestDf, "summer")
+  fall <- format_risk_totals(nestDf, "fall")
+  
+  summPlot <- joint_high_risk_plot(summ, hex, "Summer", basemap, box)
+  fallPlot <- joint_high_risk_plot(fall, hex, "Fall", basemap, box)
+  
+  pltnm <- paste0("./figures/high_risk_taxa_counts_", region_name, ".png")
+  
+  save_combo_plot(summCol = summPlot, fallCol = fallPlot, taxaLab = NA, plotName = pltnm, region_name = region_name)
+}
+
+
+#' Format risk totals data for high-risk taxa counts.
+#'
+#' This function formats the nested risk data frames into counts of the number of high risk taxa groups per hex
+#'
+#' @param nestDf Nested data frame containing seasonal risk data for each unique taxa and vessel activity metric combination.
+#' @param colname Name of the column.
+#' @return Formatted data for high-risk taxa counts.
+format_risk_totals <- function(nestDf, colname){
+  
+  t <- unnest(nestDf, cols = c({{colname}})) %>% 
+    filter(traff == "hrs_al") %>% 
+    filter(risk_cat %in% c("high", "veryhigh")) %>% 
+    filter(taxa != "total_seabirds") %>% 
+    group_by(hex_id) %>% 
+    summarize(nTaxa = n())
+
+return(t)
+}
+
+
+#' Create a map of the number of high-risk taxa groups
+#'
+#' This function generates a map of the number of high-risk taxa groups.
+#'
+#' @param df Data frame containing high-risk taxa counts created using the format_risk_totals function. 
+#' @param hex Output of prep_regional_hexes. An sf object containing geometries of hexes with sufficient survey effort for inclusion in the study. 
+#' @param title Title of the plot.
+#' @param basemap Sf object containing basemap for a given region. 
+#' @param box Bounding box object delineating boundaries of a given region.
+#' @return A joint plot for high-risk taxa counts.
+joint_high_risk_plot <- function(df, hex, title, basemap, box){
+  
+  dfSf <- left_join(hex, df, by="hex_id")
+  dfSf$nTaxa[is.na(dfSf$nTaxa)] <- 0
+  dfSf$nTaxa <- as.character(dfSf$nTaxa)
+  
+  cols <- generate_color_palette()
+  
+  pltEmpty <- plot_empty(basemap, box)
+  
+  plt <- pltEmpty +
+    geom_sf(data=box, fill=NA, color=NA,lwd=0) +      
+    geom_sf(data=basemap, fill="lightgray",lwd=0) +
+    geom_sf(data=dfSf,aes(fill = nTaxa), color="darkgray") +
+    scale_fill_manual(values = c("1" = "#ffae52",
+                                 "2" = "#a83b00",
+                                 "3" = "#281863",
+                                 "4" = "black"),
+                      na.value = "white",
+                      name="Number of Taxa Groups", 
+                      drop=F)
+  return(plt)
+}
+
+
+

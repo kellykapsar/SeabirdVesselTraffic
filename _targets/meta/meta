@@ -1,5 +1,5 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
-.Random.seed|object|9483de52657682db|||||||||||||||
+.Random.seed|object|0a80b7f148b40bbc|||||||||||||||
 allRegions|stem|0ea703b15b381b16|49f910ffa1c425d9|a069629e234f9c22|1512678277||t19586.8110855319s|6780c20ed7ba8483|607|rds|local|vector|||0||
 allRisk|stem|28f4ba02ce262ddf|88ef1452264a4a72|7dad31d55a264926|597465893||t19590.8368517861s|848c2b89d15fbe0d|2837|rds|local|vector|||0.05||
 allSpp|object|80b9310b52e98d60|||||||||||||||
@@ -39,6 +39,7 @@ data_summary|stem|03081cc770793d70|ecfd16a3d74ced41|4643f6dc5759f364|1353521754|
 df_goa|stem|error|83a13a1433c4af0b|f0800e0cb1ad6850|-2005106304||t19570.7606467922s|44e327d1ee1978d7|43|rds|local|vector|||0||no applicable method for left_join applied to an object of class NULL
 df_nbs_cs|stem|error|e7df34e68f1b5d47|87e693b1291529e9|-239195436||t19570.7606469428s|44e327d1ee1978d7|43|rds|local|vector|||0||no applicable method for left_join applied to an object of class NULL
 fileDir|object|572d4047f3158f11|||||||||||||||
+format_risk_totals|function|b3d76c5195b77d5e|||||||||||||||
 fullDf|stem|ad5a0aad47683830|b0b19cbfdf216592|5e475ab09d50db80|-1740321634||t19586.8080990666s|238e3c8fa3630281|106179|rds|local|vector|||0.04||
 generate_color_palette|function|432765594bde8af4|||||||||||||||
 get_hex_density|function|a4e3468efe8a425e|||||||||||||||
@@ -46,10 +47,15 @@ get_study_area|function|69535e13ab434a07|||||||||||||||
 get_study_area_transects|function|c8f3348c1fe66383|||||||||||||||
 hex|object|5dd7140ed72b6832|||||||||||||||
 inits|object|3c2544d454b3ba82|||||||||||||||
+joint_high_risk_plot|function|7b1ae3daf4cbb5bf|||||||||||||||
+jointRiskMap_aleut|stem|d71e84a7cb66956c|8c43995a522d02c9|67816920f44a1e36|1195132905||t19592.8564029102s|17e1813002340629|93|rds|local|vector|||0.99||
+jointRiskMap_all.ak|stem|a974205da2fd5ecb|a3fb3ba2839133f5|4d2bfce2e7ff575f|-1366666214||t19592.856459262s|9903306e1685fb67|94|rds|local|vector|||2.72||
+jointRiskMap_goa|stem|6cb4b281c4c6bdc5|5503ca05d1fa2891|44de468c2aade748|-510809858||t19592.8564769153s|e961a0bcff3caad6|91|rds|local|vector|||1.48||
+jointRiskMap_nbs.cs|stem|d7e63e588d97e3c2|cc7635a009917182|0521635747eee633|141617406||t19592.8564267425s|9903306e1685fb67|94|rds|local|vector|||2||
 label_to_snake|function|83b18c324c367414|||||||||||||||
 load_regions|function|e17a0173e18a8b0d|||||||||||||||
 loc|object|64840534b70b690c|||||||||||||||
-mapped_pipeline|object|9134c9f6e051742e|||||||||||||||
+mapped_pipeline|object|60fa6c6ef197fe31|||||||||||||||
 merge_bird_boat|function|0860eedb286ddce9|||||||||||||||
 multi_taxa_hex_density|function|1e06f985b25b5a69|||||||||||||||
 nightBarGraph|stem|bb465cb7ad9a1e5b|42235fdbd29bf388|360ef88ea2db78c3|1205195198||t19592.7023708074s|4bab66ba4bee4440|108|rds|local|vector|||0.35||
@@ -59,6 +65,7 @@ output_nbs_cs|stem|d131862dc333587a|dceed2cb83fbbaa9|14c28dd322351e75|1381879250
 params|object|a457b8ad0b199241|||||||||||||||
 plot_bird|function|dc77d03cf89c2b1b|||||||||||||||
 plot_empty|function|6fe1970cde9486cf|||||||||||||||
+plot_joint_high_risk|function|f45d4446d7cd56ed|||||||||||||||
 plot_risk|function|7672d121344b0fd9|||||||||||||||
 plot_risk_cat|function|1d8b1bba0ea28598|||||||||||||||
 plot_risk_categorical|function|e313fc305938e25a|||||||||||||||
