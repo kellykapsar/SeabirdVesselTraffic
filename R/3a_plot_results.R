@@ -100,12 +100,30 @@ generate_color_palette <- function(){
 #' @param box Bounding box object delineating boundaries of a given region.
 #' @return None.
 plot_traff <- function(nestDf, region_name, hex, basemap, box){
-  plotName <- paste0("./figures/traff_", nestDf$traff[1] ,"_", region_name, ".png")
+  nestDf$plotName <- paste0("./figures/traff_", nestDf$traff ,"_", region_name, ".png")
   
-  summCol <- traff_plot(nestDf$summer[[1]], region_name, hex, "Summer", basemap, box)
-  fallCol <- traff_plot(nestDf$fall[[1]], region_name, hex, "Fall", basemap, box)
+  # Remove rows with duplicate taxa, but differentvessel traffic rows
+  nestDfnew <- nestDf[!duplicated(nestDf$traff),] 
   
-  save_combo_plot(summCol, fallCol, NA, plotName, region_name)
+  nestDfnew <- nestDfnew %>% mutate(summTraff = map(summer, ~traff_plot(.x, 
+                                                                      region_name = region_name,
+                                                                      hex = hex, 
+                                                                      title = "Summer", 
+                                                                      basemap = basemap, 
+                                                                      box = box)), 
+                                    fallTraff = map(fall, ~traff_plot(.x, 
+                                                                    region_name = region_name,
+                                                                    hex = hex, 
+                                                                    title = "Fall", 
+                                                                    basemap = basemap, 
+                                                                    box = box)))
+  
+  apply(nestDfnew, 1, function(x){save_combo_plot(summCol = x$summTraff, 
+                                                  fallCol = x$fallTraff, 
+                                                  taxaLab = NA,
+                                                  plotName = x$plotName, 
+                                                  region_name = region_name)})  
+  
 }
 
 
