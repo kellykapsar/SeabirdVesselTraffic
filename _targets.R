@@ -142,7 +142,11 @@ mapped_pipeline <- tar_map(
   # Create table of summary statistics for risk in a given region 
   tar_target(riskSummary, 
              command = risk_summary_table(nestDf = riskDfs, 
-                                          region_title = title))) 
+                                          region_title = title)), 
+  
+  tar_target(taxaBarGraph, 
+             command = bar_graph_taxa(df = riskSummary,
+                                      region_name = name))) 
 
 # Combine regional results  ----------------------------------------------------
 
@@ -156,8 +160,15 @@ out_risk <- tar_combine(allRisk,
                         mapped_pipeline[["riskSummary"]], 
                         command=bind_rows(!!!.x))
 
+combined_summaries <- list(tar_target(regionBarGraph,
+                                      command = bar_graph_regions(df = allRisk)), 
+                           
+                           tar_target(nightBarGraph, 
+                                      command = risk_bar_graph_night(df = allRisk))
+)
+
 # Join targets into master list  ----------------------------------------------
-list(inits, mapped_pipeline, out_regions, out_risk)
+list(inits, mapped_pipeline, out_regions, out_risk, combined_summaries)
 
 
 
