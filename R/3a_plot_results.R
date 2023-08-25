@@ -461,4 +461,27 @@ joint_high_risk_plot <- function(df, hex, title, basemap, box){
 }
 
 
+#' Map of study area 
+#'
+#' This function creates a categorical risk map for a single taxa and vessel activity metric combination.
+#'
+#' @param df Individual risk data frame for one season and one bird density/vessel activity metric combo
+#' @param hex Hexagon data.
+#' @param title Title of the plot.
+#' @param basemap Sf object containing basemap for a given region. 
+#' @param box Bounding box object delineating boundaries of a given region.
+#' @return The risk category plot.
+study_area_map <- function(hex, basemap, allBoxes){
+  
+  plottheme <- plot_theme()
+  
+  pltEmpty <- plot_empty(basemap, allBoxes[allBoxes$name == "all-ak",])
+  
+  plt <- pltEmpty +
+    geom_sf(data = hex, fill = NA, color = "darkgray") +
+    geom_sf(data = allBoxes, fill = NA, color = "black") +
+    plottheme 
+  
+  return(plt)
+}
 
