@@ -94,7 +94,7 @@ mapped_pipeline <- tar_map(
   # Create bounding box for plotting
   tar_target(box, 
              command = st_as_sf(st_buffer(st_as_sfc(st_bbox(studyHexes)), 10000),
-             name = "boundary")),
+             name = name)),
   
   # Crop basemape to region for plotting
   tar_target(basemapnew, 
@@ -135,8 +135,9 @@ mapped_pipeline <- tar_map(
   
   # Create table of summary statistics for a region 
   tar_target(regionSummary, 
-             command = region_summary_table(fullDf = fullDf, 
-                                            nestDf = riskDfs, 
+             command = region_summary_table(fullDf = fullDf,
+                                            nestDf = riskDfs,
+                                            hex = studyHexes, 
                                             region_title = title)),
   
   # Create table of summary statistics for risk in a given region 
@@ -166,15 +167,24 @@ out_risk <- tar_combine(allRisk,
                         mapped_pipeline[["riskSummary"]], 
                         command=bind_rows(!!!.x))
 
+# Create master sf object with all study area bounding boxes
+out_study <- tar_combine(allBoxes, 
+                        mapped_pipeline[["box"]], 
+                        command=bind_rows(!!!.x))
+
 combined_summaries <- list(tar_target(regionBarGraph,
                                       command = bar_graph_regions(df = allRisk)), 
                            
                            tar_target(nightBarGraph, 
-                                      command = risk_bar_graph_night(df = allRisk))
+                                      command = risk_bar_graph_night(df = allRisk)),
+                           tar_target(allRiskTable, 
+                                      command = make_joint_risk_table(df = allRisk)), 
+                           tar_target(allRegionTable, 
+                                      command = make_joint_region_table(df = allRegions))
 )
 
 # Join targets into master list  ----------------------------------------------
-list(inits, mapped_pipeline, out_regions, out_risk, combined_summaries)
+list(inits, mapped_pipeline, out_regions, out_risk, out_study, combined_summaries)
 
 
 
