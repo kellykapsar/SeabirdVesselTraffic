@@ -48,7 +48,7 @@ plot_empty <- function(basemap, box){
   
   plt <- ggplot() +
     geom_sf(data=box, fill=NA, color=NA,lwd=0) +   
-    geom_sf(data=basemap, fill="lightgray", lwd=0) +
+    geom_sf(data=basemap, fill="lightgray", lwd=0, color=NA) +
     plottheme
   return(plt)
 }
@@ -69,7 +69,7 @@ plot_theme <- function(){
           plot.subtitle = element_text(hjust = 0.5),
           plot.caption = element_text(size = 8, hjust=0),
           plot.margin = margin(t=0.5, r=0.5, b=0.5, l=0.5, unit="cm"),
-          # panel.background = element_rect(fill = "#73b2ff"),
+          # panel.background = element_rect(fill = "#333333"),
           panel.border =  element_rect(colour = "black"),
           axis.text = element_text(colour = "darkgray", size=8)))
   
@@ -100,6 +100,7 @@ generate_color_palette <- function(){
 #' @param box Bounding box object delineating boundaries of a given region.
 #' @return None.
 plot_traff <- function(nestDf, region_name, hex, basemap, box){
+  
   nestDf$plotName <- paste0("./figures/traff_", nestDf$traff ,"_", region_name, ".png")
   
   # Remove rows with duplicate taxa, but differentvessel traffic rows
@@ -152,13 +153,18 @@ traff_plot <- function(df, region_name, hex, title, basemap, box){
   
   dfSf <- hex %>% filter(hex_id %in% unique(df$hex_id)) %>% left_join(df, by="hex_id")
   
+  dfSf <- dfSf %>% mutate(test = cut_number(traff_hrs, 10))
+  
   pltEmpty <- plot_empty(basemap, box)
   plt <- pltEmpty  + 
+    # geom_sf(data=dfSf, aes(fill = test), color="darkgray") +
+    # https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html
+    # scale_fill_viridis_d(option = "H", direction = 1, name="Vessel Activity\n(Hours)") +
+    
     geom_sf(data=dfSf, aes(fill = traff_hrs), color="darkgray") +
-    # scale_fill_steps(trans="log",n.breaks=4, low = "yellow", high = "red",nice.breaks=TRUE, labels=scales::comma,
-    #                  name="Total Hours\nof Vessel Traffic", guide = guide_coloursteps(show.limits = TRUE)) +
-    scale_fill_gradientn(colours=cols, trans="pseudo_log", breaks=br, labels=scales::label_comma(),name="Vessel Activity\n(Hours)", na.value="white", limits=lims) +
-    # labs(caption = paste0("*One operating day is equal to one vessel present in a hex on a given day.")) + 
+    scale_fill_viridis_c(option = "H", direction=1, trans="pseudo_log", breaks=br,
+                         labels=scales::label_comma(),name="Vessel Activity\n(Hours)", na.value="white", limits=lims) +
+
     guides(fill = guide_colourbar(barwidth = 25, 
                                   barheight = 1, 
                                   title.hjust = 0.5,
@@ -226,9 +232,8 @@ bird_plot <- function(df, hex, title, basemap, box){
   plt <- pltEmpty  + 
     geom_sf(data=filter(dfSf, density == 0), color="darkgray", fill=NA) +
     geom_sf(data=filter(dfSf, density != 0),aes(fill = density), color="darkgray") +
-    scale_fill_gradientn(colours=cols, trans="log10", labels=scales::label_number(),name="Density \n(Ind'ls/km\u00b2)", na.value="white") +
-    # scale_fill_steps(trans="log",low = "yellow", high = "red",nice.breaks=TRUE, labels=scales::label_number(), 
-    #                  name="Density \n(Ind'ls/km\u00b2)", guide = guide_coloursteps(show.limits = TRUE)) + 
+    # scale_fill_gradientn(colours=cols, trans="log10", labels=scales::label_number(),name="Density \n(Ind'ls/km\u00b2)", na.value="white") +
+    scale_fill_viridis_c(option = "H", direction=1, trans="log10", labels=scales::label_number(),name="Density \n(Ind'ls/km\u00b2)", na.value="white") +
     scale_x_continuous(expand = c(0, 0)) +
     scale_y_continuous(expand = c(0, 0)) +
     # labs(caption = paste0("*Empty hexes were surveyed, but no ", taxaLabel, " were sighted during study period.")) + 
@@ -367,7 +372,8 @@ risk_con_plot <- function(df, hex, title, basemap, box){
   plt <- pltEmpty +
     geom_sf(data=filter(dfSf, risk_cont == 0), color="darkgray", fill=NA) +
     geom_sf(data=filter(dfSf, risk_cont != 0),aes(fill = risk_cont), color="darkgray") +
-    scale_fill_gradientn(colours=cols, labels=scales::label_number(),name="Risk Index", na.value="white") +
+    # scale_fill_gradientn(colours=cols, labels=scales::label_number(),name="Risk Index", na.value="white") +
+    scale_fill_viridis_c(option = "H", direction=1, labels=scales::label_number(),name="Risk Index", na.value="white") +
     # scale_fill_steps(trans="log",low = "yellow", high = "red",nice.breaks=TRUE, labels=scales::label_number(),
     #                  name="Density \n(Ind'ls/km\u00b2)", guide = guide_coloursteps(show.limits = TRUE)) +
     # labs(caption = paste0("*Empty hexes were surveyed, but no ", taxaLabel, " were sighted during study period.")) +
