@@ -142,10 +142,8 @@ get_hex_density <- function(obs, transectsIn, taxaList, startYear = 2006) {
   transectDensity <- left_join(transectsIn, obsIn, by = c("master_key")) %>%
     mutate(
       density = n_birds / sample_area,
-      season = ifelse(
-        month %in% c(6, 7, 8),
-        "summer",
-        ifelse(month %in% c(9, 10, 11), "fall", NA)
+      season = ifelse(month %in% c(6, 7, 8),"summer",
+               ifelse(month %in% c(9, 10, 11), "fall", NA)
       )
     ) %>%
     select(master_key, hex_id, year, month, season, sample_area, n_birds, density)
