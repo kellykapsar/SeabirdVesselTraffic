@@ -47,7 +47,8 @@ make_joint_region_table <- function(df){
                                  "Eastern Aleutians", 
                                  "Northern Bering & Chukchi Seas"))
   
-
+  df$pct_night <- round(df$n_hrs_al/df$hrs_al*100, 0)
+    
   n <- df %>%
     select(-d_hrs_al) %>% 
     gather(variable, value, -(region:n_hexes)) %>%
@@ -60,11 +61,11 @@ make_joint_region_table <- function(df){
            summer_n_transects, 
            summer_sample_area, 
            summer_hrs_al, 
-           summer_n_hrs_al,
+           summer_pct_night,
            fall_n_transects, 
            fall_sample_area, 
            fall_hrs_al, 
-           fall_n_hrs_al)
+           fall_pct_night)
   
   write.csv(n, "./figures/region_summary_table.csv", row.names = FALSE)
   return(n)
