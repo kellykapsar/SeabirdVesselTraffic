@@ -11,13 +11,13 @@
 #' @return None.
 save_combo_plot <- function(summCol, fallCol, taxaLab, plotName, region_name){
   
-  comboplot <- ggarrange(summCol, fallCol, ncol=2, nrow=1, common.legend=TRUE, legend = "bottom")
+  comboplot <- ggarrange(summCol, fallCol, ncol=2, nrow=1, common.legend=TRUE, legend = "right")
   
   if(is.na(taxaLab)){ 
-    comboplot <- comboplot + theme(panel.background = element_rect(fill = "white"))
+    comboplot <- comboplot + theme(panel.background = element_rect(fill = "white", color="white")) 
   }else{
-    comboplot <- annotate_figure(comboplot, top = text_grob(snake_to_label(taxaLab), face = "bold", size = 30)) +
-      theme(panel.background = element_rect(fill = "white"))
+    comboplot <- annotate_figure(comboplot, left = text_grob(snake_to_label(taxaLab), face = "bold", size = 30, rot=90)) +
+      theme(panel.background = element_rect(fill = "white", color="white")) 
   }
   
   if(!file.exists("./figures")){
@@ -31,7 +31,7 @@ save_combo_plot <- function(summCol, fallCol, taxaLab, plotName, region_name){
                 width=12, height=4, units="in"),
          ggsave(filename=plotName,
                 plot= comboplot,
-                width=10, height=6, units="in"))
+                width=13, height=6, units="in"))
 }
 
 
@@ -59,20 +59,37 @@ plot_empty <- function(basemap, box){
 #' This function returns a predefined plot theme.
 #'
 #' @return A list of theme elements for the plot.
-plot_theme <- function(){
-  plottheme <- list(
-    scale_x_longitude(ticks = 5, expand = c(0, 0)),
-    scale_y_latitude(ticks = 5, expand = c(0, 0)),
-    theme_bw(),
-    theme(text = element_text(size = 18),
-          plot.title = element_text(hjust = 0.5),
-          plot.subtitle = element_text(hjust = 0.5),
-          plot.caption = element_text(size = 8, hjust=0),
-          plot.margin = margin(t=0.5, r=0.5, b=0.5, l=0.5, unit="cm"),
-          # panel.background = element_rect(fill = "#333333"),
-          panel.border =  element_rect(colour = "black"),
-          axis.text = element_text(colour = "darkgray", size=8)))
-  
+plot_theme <- function(map=TRUE){
+  if(map == TRUE){
+    plottheme <- list(
+      scale_x_longitude(ticks = 5, expand = c(0, 0)),
+      scale_y_latitude(ticks = 5, expand = c(0, 0)),
+      theme_bw(),
+      theme(text = element_text(size = 18),
+            plot.title = element_text(hjust = 0.5),
+            plot.subtitle = element_text(hjust = 0.5),
+            plot.caption = element_text(size = 8, hjust=0),
+            plot.margin = margin(t=0.5, r=0.5, b=0.5, l=0.5, unit="cm"),
+            # panel.background = element_rect(fill = "#333333"),
+            panel.border =  element_rect(colour = "black"),
+            axis.text = element_text(colour = "darkgray", size=8), 
+            legend.position = "right", 
+            legend.direction = "vertical"))
+  }
+  if(map == FALSE){
+    plottheme <- list(
+      theme_bw(),
+      theme(text = element_text(size = 18),
+            plot.title = element_text(hjust = 0.5),
+            plot.subtitle = element_text(hjust = 0.5),
+            plot.caption = element_text(size = 8, hjust=0),
+            plot.margin = margin(t=0.5, r=0.5, b=0.5, l=0.5, unit="cm"),
+            # panel.background = element_rect(fill = "#333333"),
+            panel.border =  element_rect(colour = "black"),
+            axis.text = element_text(colour = "darkgray", size=8), 
+            legend.position = "right", 
+            legend.direction = "vertical"))
+  }
   return(plottheme)
 }
 
@@ -237,8 +254,8 @@ bird_plot <- function(df, hex, title, basemap, box){
     scale_x_continuous(expand = c(0, 0)) +
     scale_y_continuous(expand = c(0, 0)) +
     # labs(caption = paste0("*Empty hexes were surveyed, but no ", taxaLabel, " were sighted during study period.")) + 
-    guides(fill = guide_colourbar(barwidth = 25, 
-                                  barheight = 1, 
+    guides(fill = guide_colourbar(barwidth = 1, 
+                                  barheight =15, 
                                   title.hjust = 0.5,
                                   ticks.colour="black", 
                                   frame.colour = "black", 
@@ -306,6 +323,11 @@ risk_cat_plot <- function(df, hex, title, basemap, box){
                                  "mediumSHIP" = "#14ff96",
                                  "high" = "#f7f570",
                                  "veryhigh" = "#e31a1c"),
+    # scale_fill_manual(values = c("low" = "#60B257",
+    #                              "mediumBIRD" = "#F1963F",
+    #                              "mediumSHIP" = "#FADA4A",
+    #                              "high" = "#EB3223",
+    #                              "veryhigh" = "#911111"),
                       na.value = "white",
                       name="Risk", 
                       drop=F,
