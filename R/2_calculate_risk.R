@@ -101,9 +101,10 @@ risk_subset <- function(df, birdCol, shipCol, region_name){
   
   oneBird$taxa <- as.character({{birdCol}})
   oneBird$traff <- as.character({{shipCol}})
+  oneBird$region <- region_name
   
-  t <- oneBird %>% dplyr::select(hex_id, season, taxa, traff, density, traff_hrs, risk_cat, risk_cont)
-  tnew <- t %>% group_by(season, taxa, traff) %>% nest()
+  t <- oneBird %>% dplyr::select(hex_id, season, taxa, region, traff, density, traff_hrs, risk_cat, risk_cont)
+  tnew <- t %>% group_by(season, region, taxa, traff) %>% nest()
   return(tnew)
 }
 
