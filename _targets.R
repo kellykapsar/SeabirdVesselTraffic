@@ -163,9 +163,12 @@ out_regions <- tar_combine(allRegions,
                            command=bind_rows(!!!.x))
 
 # Combine risk summary tables into master table
-out_risk <- tar_combine(allRisk, 
+out_risk <- list(tar_combine(allRisk, 
                         mapped_pipeline[["riskSummary"]], 
-                        command=bind_rows(!!!.x))
+                        command=bind_rows(!!!.x)), 
+            tar_combine(fullRisk, 
+                        mapped_pipeline[["riskDfs"]], 
+                        command=bind_rows(!!!.x)))
 
 # Create master sf object with all study area bounding boxes
 out_study <- tar_combine(allBoxes, 
