@@ -67,6 +67,10 @@ inits <- list(
   tar_target(fullDf, 
              command = left_join(birdDat, traffDat)),
   
+  # Calculate percentage of total observations for each focal taxa group and for all combined 
+  tar_target(propObs, 
+             command = focal_taxa_pct_obs(fullDf)),
+  
   # Save data frame
   tar_target(test,
              command = write.csv(fullDf,

@@ -103,12 +103,47 @@ multi_taxa_hex_density <- function(obs, transectsIn, taxaDf, startYear = 2006) {
       transectsIn = transectsIn,
       taxaList = listTaxaList[i]
     )
-    
-    finalDf <- left_join(finalDf, temp, by = c("hex_id", "season", "n_transects", "sample_area"))
+
+        finalDf <- left_join(finalDf, temp, by = c("hex_id", "season", "n_transects", "sample_area"))
     rm(temp)
   }
   
   return(finalDf)
+}
+
+
+#' Calculates percentage of observations represented by focal taxa 
+#'
+#' @param fullDf Output data frame from multi_taxa_hex_density function
+#' each focal taxa group and for all focal taxa groups combined
+focal_taxa_pct_obs <- function(fullDf){
+  
+  obsCounts <- fullDf %>% 
+    group_by(season) %>% 
+    summarize_each(funs = sum)
+  
+  countCols <- grep("n_birds", colnames(obsCounts), value = TRUE)
+  
+  obsCounts <- obsCounts[, c("season", countCols)]
+  
+  propCounts <- obsCounts[,2:ncol(obsCounts)]/obsCounts$total_seabirds_n_birds
+  
+  propCounts <- propCounts %>% 
+    select(-total_seabirds_n_birds) %>% 
+    mutate(total= round(rowSums(select_if(., is.numeric))*100, 2), 
+           season = obsCounts$season) %>% 
+    relocate(season, total)
+  
+  propCounts[,3:ncol(propCounts)] <- lapply(propCounts[,3:ncol(propCounts)], function(x) round(x*100, 2))
+
+  
+  print(paste0("Focal taxa groups represent ", 
+               propCounts$total[propCounts$season == "summer"], 
+               "% of all seabird observations in summer and ", 
+               propCounts$total[propCounts$season == "fall"], 
+               "% of all observations in fall. "))
+  
+  return(propCounts)
 }
 
 #' Calculate Hexagon Density
@@ -121,16 +156,11 @@ multi_taxa_hex_density <- function(obs, transectsIn, taxaDf, startYear = 2006) {
 #' @param taxaList Derived within multi_taxa_hex_density
 #' @param startYear The starting year for filtering observation data.
 #' @return A data frame containing hexagon density information for the specified taxa.
-#' @import dplyr
-#' @examples
-#' obs <- read.csv("observation_data.csv")
-#' transects <- read.csv("transect_data.csv")
-#' taxa_list <- c("taxa1", "taxa2")
-#' hex_density <- get_hex_density(obs, transects, taxa_list, startYear = 2010)
 get_hex_density <- function(obs, transectsIn, taxaList, startYear = 2006) {
   
   taxa <- unlist(taxaList)
   taxaLab <- label_to_snake(names(taxaList))
+  taxaLab_nbirds <- paste0(taxaLab, "_n_birds")
   
   obsIn <- obs %>%
     filter(on_off_tx == "ON") %>%
@@ -151,15 +181,21 @@ get_hex_density <- function(obs, transectsIn, taxaList, startYear = 2006) {
   transectDensity$n_birds[is.na(transectDensity$n_birds)] <- 0
   transectDensity$density[is.na(transectDensity$density)] <- 0
   
+  
+  
   hexDensity1 <- transectDensity %>%
     mutate(n_birds = ifelse(n_birds > 10000, 10000, n_birds)) %>%
     group_by(hex_id, season) %>%
     summarize(
       density = mean(density),
       n_transects = n(),
-      sample_area = sum(sample_area)
+      sample_area = sum(sample_area),
+      n_birds = sum(n_birds)
     ) %>%
-    rename({{taxaLab}} := density)
+    rename({{taxaLab}} := density, 
+           {{taxaLab_nbirds}} := n_birds)
+  
+  
   
   return(hexDensity1)
 }

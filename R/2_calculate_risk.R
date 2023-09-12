@@ -12,7 +12,12 @@ calculate_risk <- function(df, shpfile, region_name){
   # Excluded hexes outside of study area 
   dfnew <- df[df$hex_id %in% shpfile$hex_id,]
   
-  birdCols <- colnames(dfnew)[!(colnames(dfnew) %in% c("hex_id", "season", "n_transects", "sample_area", "hrs_al", "d_hrs_al", "n_hrs_al"))]
+  birdCols <- colnames(dfnew)[!(colnames(dfnew) %in% 
+                                  c("hex_id", "season", "n_transects", "sample_area", "hrs_al", "d_hrs_al", "n_hrs_al"))]
+  
+  # Remove number of bird observations column from future analyses (only density values used)
+  birdCols <- birdCols[grep("n_birds", birdCols, invert = TRUE)]
+  
   shipCols <- c("hrs_al", "d_hrs_al", "n_hrs_al")
   
   vars <- expand.grid(bird = birdCols, ship = shipCols)
