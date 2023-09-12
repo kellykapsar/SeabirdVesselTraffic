@@ -9,16 +9,15 @@
 #' @param plotName Name of the saved plot file.
 #' @param region_name Name of the region being analyzed.
 #' @return None.
-save_combo_plot <- function(summCol, fallCol, taxaLab, plotName, region_name){
+save_combo_plot <- function(summCol, fallCol, taxaLab, plotName, region_name, risk_cat = FALSE){
   
-  comboplot <- ggarrange(summCol, fallCol, ncol=2, nrow=1, common.legend=TRUE, legend = "right")
-  
-  if(is.na(taxaLab)){ 
-    comboplot <- comboplot + theme(panel.background = element_rect(fill = "white", color="white")) 
+  if(risk_cat == FALSE){
+    comboplot <- ggarrange(summCol, fallCol, ncol=2, nrow=1, common.legend=TRUE, legend = "right")
   }else{
-    comboplot <- annotate_figure(comboplot, left = text_grob(snake_to_label(taxaLab), face = "bold", size = 30, rot=90)) +
-      theme(panel.background = element_rect(fill = "white", color="white")) 
+    comboplot <- ggarrange(summCol, fallCol, ncol=2, nrow=1, legend = "none")
   }
+  comboplot <- annotate_figure(comboplot, left = text_grob(snake_to_label(taxaLab), face = "bold", size = 30, rot=90)) +
+      theme(panel.background = element_rect(fill = "white", color="white")) 
   
   if(!file.exists("./figures")){
     dir.create("./figures")
@@ -28,7 +27,7 @@ save_combo_plot <- function(summCol, fallCol, taxaLab, plotName, region_name){
   ifelse(region_name == "aleut",
          ggsave(filename=plotName,
                 plot= comboplot,
-                width=12, height=4, units="in"),
+                width=12, height=3, units="in"),
          ggsave(filename=plotName,
                 plot= comboplot,
                 width=13, height=6, units="in"))
@@ -69,7 +68,7 @@ plot_theme <- function(map=TRUE){
             plot.title = element_text(hjust = 0.5),
             plot.subtitle = element_text(hjust = 0.5),
             plot.caption = element_text(size = 8, hjust=0),
-            plot.margin = margin(t=0.5, r=0.5, b=0.5, l=0.5, unit="cm"),
+            plot.margin = margin(t=0, r=0, b=0, l=0, unit="mm"),
             # panel.background = element_rect(fill = "#333333"),
             panel.border =  element_rect(colour = "black"),
             axis.text = element_text(colour = "darkgray", size=8), 
@@ -92,19 +91,6 @@ plot_theme <- function(map=TRUE){
   }
   return(plottheme)
 }
-
-
-#' Generate a color palette.
-#'
-#' This function generates a color palette for plotting.
-#'
-#' @return A color palette.
-generate_color_palette <- function(){
-  cols <- c(colorRampPalette(c("#e7f0fa", "#c9e2f6", "#95cbee", "#0099dc", "#4ab04a", "#ffd73e"))(25),
-            colorRampPalette(c("#eec73a", "#e29421", "#e29421", "#f05336","#ce472e"), bias=2)(25))
-  return(cols)
-}
-
 
 #' Plot vessel traffic.
 #'
@@ -138,7 +124,7 @@ plot_traff <- function(nestDf, region_name, hex, basemap, box){
   
   apply(nestDfnew, 1, function(x){save_combo_plot(summCol = x$summTraff, 
                                                   fallCol = x$fallTraff, 
-                                                  taxaLab = NA,
+                                                  taxaLab = "Vessel Traffic",
                                                   plotName = x$plotName, 
                                                   region_name = region_name)})  
   
@@ -166,11 +152,11 @@ traff_plot <- function(df, region_name, hex, title, basemap, box){
     lims <- c(0,50000)
   }
   
-  cols <- generate_color_palette()
-  
   dfSf <- hex %>% filter(hex_id %in% unique(df$hex_id)) %>% left_join(df, by="hex_id")
-  
-  dfSf <- dfSf %>% mutate(test = cut_number(traff_hrs, 10))
+
+  if(!file.exists(paste0("./data_processed/StudyAreaHexes_", region_name, ".shp"))){
+    st_write(dfSf, paste0("./data_processed/StudyAreaHexes_", region_name, ".shp"))
+  }
   
   pltEmpty <- plot_empty(basemap, box)
   plt <- pltEmpty  + 
@@ -182,8 +168,8 @@ traff_plot <- function(df, region_name, hex, title, basemap, box){
     scale_fill_viridis_c(option = "H", direction=1, trans="pseudo_log", breaks=br,
                          labels=scales::label_comma(),name="Vessel Activity\n(Hours)", na.value="white", limits=lims) +
 
-    guides(fill = guide_colourbar(barwidth = 25, 
-                                  barheight = 1, 
+    guides(fill = guide_colourbar(barwidth = 1, 
+                                  barheight = 15, 
                                   title.hjust = 0.5,
                                   ticks.colour="black", 
                                   frame.colour = "black", 
@@ -241,8 +227,6 @@ plot_bird <- function(nestDf, region_name, hex, basemap, box){
 #' @return None.
 bird_plot <- function(df, hex, title, basemap, box){
 
-  cols <- generate_color_palette()
-  
   dfSf <- hex %>% filter(hex_id %in% unique(df$hex_id)) %>% left_join(df, by="hex_id")
   
   pltEmpty <- plot_empty(basemap, box)
@@ -251,8 +235,6 @@ bird_plot <- function(df, hex, title, basemap, box){
     geom_sf(data=filter(dfSf, density != 0),aes(fill = density), color="darkgray") +
     # scale_fill_gradientn(colours=cols, trans="log10", labels=scales::label_number(),name="Density \n(Ind'ls/km\u00b2)", na.value="white") +
     scale_fill_viridis_c(option = "H", direction=1, trans="log10", labels=scales::label_number(),name="Density \n(Ind'ls/km\u00b2)", na.value="white") +
-    scale_x_continuous(expand = c(0, 0)) +
-    scale_y_continuous(expand = c(0, 0)) +
     # labs(caption = paste0("*Empty hexes were surveyed, but no ", taxaLabel, " were sighted during study period.")) + 
     guides(fill = guide_colourbar(barwidth = 1, 
                                   barheight =15, 
@@ -294,7 +276,8 @@ plot_risk_cat <- function(nestDf, region_name, hex, basemap, box){
                                                fallCol = x$fallCat, 
                                                taxaLab = x$taxa,
                                                plotName = x$plot_name, 
-                                               region_name = region_name)})  
+                                               region_name = region_name, 
+                                               risk_cat = TRUE)})  
   
 }
 
@@ -310,8 +293,6 @@ plot_risk_cat <- function(nestDf, region_name, hex, basemap, box){
 #' @param box Bounding box object delineating boundaries of a given region.
 #' @return The risk category plot.
 risk_cat_plot <- function(df, hex, title, basemap, box){
-  
-  plottheme <- plot_theme()
   
   dfSf <- hex %>% filter(hex_id %in% unique(df$hex_id)) %>% left_join(df, by="hex_id")
   
@@ -332,7 +313,6 @@ risk_cat_plot <- function(df, hex, title, basemap, box){
                       name="Risk", 
                       drop=F,
                       labels = c("Low", "Moderate (bird)", "Moderate (ship)", "High", "Very High")) +
-    plottheme +
     ggtitle(title)
   return(plt)
 }
@@ -384,11 +364,7 @@ plot_risk_con <- function(nestDf, region_name, hex, basemap, box){
 #' @return The continuous risk plot.
 risk_con_plot <- function(df, hex, title, basemap, box){
   
-  plottheme <- plot_theme()
-  
   dfSf <- hex %>% filter(hex_id %in% unique(df$hex_id)) %>% left_join(df, by="hex_id")
-  
-  cols <- generate_color_palette()
   
   pltEmpty <- plot_empty(basemap, box)
   plt <- pltEmpty +
@@ -399,13 +375,12 @@ risk_con_plot <- function(df, hex, title, basemap, box){
     # scale_fill_steps(trans="log",low = "yellow", high = "red",nice.breaks=TRUE, labels=scales::label_number(),
     #                  name="Density \n(Ind'ls/km\u00b2)", guide = guide_coloursteps(show.limits = TRUE)) +
     # labs(caption = paste0("*Empty hexes were surveyed, but no ", taxaLabel, " were sighted during study period.")) +
-    guides(fill = guide_colourbar(barwidth = 25,
-                                  barheight = 1,
+    guides(fill = guide_colourbar(barwidth = 1,
+                                  barheight = 15,
                                   title.hjust = 0.5,
                                   ticks.colour="black",
                                   frame.colour = "black",
                                   ticks.linewidth = 0.75)) +
-    plottheme +
     ggtitle(title)
   return(plt)
 }
@@ -470,8 +445,6 @@ joint_high_risk_plot <- function(df, hex, title, basemap, box){
   dfSf$nTaxa[is.na(dfSf$nTaxa)] <- 0
   dfSf$nTaxa <- as.character(dfSf$nTaxa)
   
-  cols <- generate_color_palette()
-  
   pltEmpty <- plot_empty(basemap, box)
   
   plt <- pltEmpty +
@@ -485,31 +458,6 @@ joint_high_risk_plot <- function(df, hex, title, basemap, box){
                       na.value = "white",
                       name="Number of Taxa Groups", 
                       drop=F)
-  return(plt)
-}
-
-
-#' Map of study area 
-#'
-#' This function creates a categorical risk map for a single taxa and vessel activity metric combination.
-#'
-#' @param df Individual risk data frame for one season and one bird density/vessel activity metric combo
-#' @param hex Hexagon data.
-#' @param title Title of the plot.
-#' @param basemap Sf object containing basemap for a given region. 
-#' @param box Bounding box object delineating boundaries of a given region.
-#' @return The risk category plot.
-study_area_map <- function(hex, basemap, allBoxes){
-  
-  plottheme <- plot_theme()
-  
-  pltEmpty <- plot_empty(basemap, allBoxes[allBoxes$name == "all-ak",])
-  
-  plt <- pltEmpty +
-    geom_sf(data = hex, fill = NA, color = "darkgray") +
-    geom_sf(data = allBoxes, fill = NA, color = "black") +
-    plottheme 
-  
   return(plt)
 }
 
