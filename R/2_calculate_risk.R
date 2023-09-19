@@ -84,11 +84,11 @@ risk_subset <- function(df, birdCol, shipCol, region_name){
   # ShipVal99 <- min(oneBird$traff_hrs[which(oneBird$quant_ship > 0.99)])
   # oneBird$traff_hrs_rescale1 <-  ifelse(oneBird$quant_ship > 0.99, ShipVal99, oneBird$traff_hrs)
   
-  oneBird$bird_rescale <- log(oneBird$density+1)
-  oneBird$ship_rescale <- log(oneBird$traff_hrs+1)
+  # oneBird$bird_rescale <- log(oneBird$density+1)
+  # oneBird$ship_rescale <- log(oneBird$traff_hrs+1)
   
-  # oneBird$density_rescale3 <- rescale(log(oneBird$density+1), to = c(0,10))
-  # oneBird$traff_hrs_rescale3 <- rescale(log(oneBird$traff_hrs+1), to = c(0, 10))
+  oneBird$bird_rescale <- rescale(log(oneBird$density+1), to = c(0,10))
+  oneBird$ship_rescale <- rescale(log(oneBird$traff_hrs+1), to = c(0, 10))
   
   # oneBird$riskcont1 <- oneBird$density_rescale1*oneBird$traff_hrs_rescale1
   oneBird$risk_cont <- oneBird$bird_rescale*oneBird$ship_rescale

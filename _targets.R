@@ -4,13 +4,14 @@ library(tidyverse, quietly = TRUE)
 library(sf, quietly = TRUE)
 library(metR, quietly = TRUE)
 library(ggpubr, quietly=TRUE)
+library(scales, quietly = TRUE)
 
 # Read functions necessary for the workflow. 
 scripts <- list.files("R/", full.names = TRUE)
 sapply(scripts, source)
 
 # Set target-specific options such as packages:
-tar_option_set(packages = c("tidyverse", "sf", "metR", "ggpubr"), 
+tar_option_set(packages = c("tidyverse", "sf", "metR", "ggpubr", "scales"), 
                error = "null")
 
 

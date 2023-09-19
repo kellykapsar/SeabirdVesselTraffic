@@ -27,7 +27,7 @@ save_combo_plot <- function(summCol, fallCol, taxaLab, plotName, region_name, ri
   ifelse(region_name == "aleut",
          ggsave(filename=plotName,
                 plot= comboplot,
-                width=12, height=3, units="in"),
+                width=12, height=4, units="in"),
          ggsave(filename=plotName,
                 plot= comboplot,
                 width=13, height=6, units="in"))
