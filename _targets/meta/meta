@@ -1,13 +1,13 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
-.Random.seed|object|b950721e005e3476|||||||||||||||
+.Random.seed|object|431890e8c84b2dc2|||||||||||||||
 allBoxes|stem|27fa9fbea4e59b53|22300b7b3ce853d5|0555357d345a9818|-831988657||t19593.8788755046s|c053fcfdc4dd355b|5097|rds|local|vector|||0||
 allRegions|stem|54405566a29a81d1|49f910ffa1c425d9|7a765e02f4ba7f88|1512678277||t19619.9019084464s|bf8f9b5758e72d99|619|rds|local|vector|||0.02||
 allRegionTable|stem|a9f969e531caf745|742d3a978de312cc|39be59af18a28055|-1619579170||t19619.9019456351s|543785243dfaf17e|595|rds|local|vector|||0.07||
 allRisk|stem|4d8475968115921c|88ef1452264a4a72|1f4dc0c198bc5de7|597465893||t19619.9018836647s|e0bfc4ae288806f1|2809|rds|local|vector|||0.18||
 allRiskTable|stem|dd8b58c245ac6624|4d0ff9152f02f340|91d2761db19f21bf|-533189754||t19619.9019444704s|ec7d8651d821670f|1217|rds|local|vector|||0.04||
 allSpp|object|80b9310b52e98d60|||||||||||||||
-bar_graph_regions|function|250281f02d5532c0|||||||||||||||
-bar_graph_taxa|function|503c9ed4fe49cbcf|||||||||||||||
+bar_graph_regions|function|eabfe7d032386694|||||||||||||||
+bar_graph_taxa|function|b2c9c44a8d0d4818|||||||||||||||
 basemap|object|2e5a3094980e00df|||||||||||||||
 basemapnew_aleut|stem|756d755a95f22b67|2481ad17ce76d8aa|2bb6e90c51cb4fe5|1087560900||t19593.8788541045s|f904f7f6ed914acc|156986|rds|local|vector|||0.17|attribute variables are assumed to be spatially constant throughout all geometries|
 basemapnew_all.ak|stem|8c42a225fa309350|4389ecef29a308ea|7a0fa1c6393d380a|-1190325514||t19593.8788748493s|877f62a98b26f74a|2429087|rds|local|vector|||0.48|attribute variables are assumed to be spatially constant throughout all geometries|
@@ -25,6 +25,8 @@ box_aleut|stem|7856702454349619|69d3b62a410952c4|e99dc23f418e7d7e|1916630684||t1
 box_all.ak|stem|be9479c688a657a4|3c36502bc0f71164|16c66d730bb2fa7f|-1690729236||t19593.8788516574s|2ee7573e6efb591c|2146|rds|local|vector|||0||
 box_goa|stem|f099f9df9b586100|5279b390a6663e08|11423dbe63249ed2|-130382298||t19593.8788509994s|78a295250055e903|2154|rds|local|vector|||0||
 box_nbs.cs|stem|91c2aeaee9d4fcc4|445f6a687db28d68|c05a0b797b5b7aac|1222998959||t19593.8788502282s|f8506963f9eb5825|2148|rds|local|vector|||0.01||
+boxplot_regions|function|539fe037d0e3e88e|||||||||||||||
+boxplot_taxa|function|1c1e9ee2b78a3ad2|||||||||||||||
 calculate_risk|function|6c891d05d7570467|||||||||||||||
 calculate_risk_global|function|50b431f688ab1f92|||||||||||||||
 catPlots_aleut|stem|0a0231abfc552250|8eab9b735272a2f7|30b89faa02fd124b|10527148||t19619.9163953797s|d34faae1f346fb15|226|rds|local|vector|||35.81||
@@ -32,7 +34,7 @@ catPlots_all.ak|stem|0c0198f30d24557f|c477bc9d407faeda|4f7f66a0a4c8a221|-5886484
 catPlots_goa|stem|bb639f0102522c3d|4577e00b782b2e21|b616c349ce11190b|538475385||t19619.9096786953s|d34faae1f346fb15|226|rds|local|vector|||50.55||
 catPlots_nbs.cs|stem|4bdcee78fb653498|53afe7ed603eea55|85ff794d0fbb58a2|-1081991464||t19619.9142056662s|d34faae1f346fb15|226|rds|local|vector|||69.48||
 clean_traff_subsets|function|f4d8e8b942e70db3|||||||||||||||
-combined_summaries|object|c2aea012197355fe|||||||||||||||
+combined_summaries|object|5111a82385a940e6|||||||||||||||
 conPlots_aleut|stem|ec62674a277df18b|d5535351ade5a61c|b7248781edf69fe5|70340038||t19619.9159805489s|a72b4e607ecebf44|222|rds|local|vector|||38.36||
 conPlots_all.ak|stem|36bacc15b1f69f86|40187178c8e2d34d|00d2098c6cf03720|-174555473||t19619.9123235355s|a72b4e607ecebf44|222|rds|local|vector|||106.07||
 conPlots_goa|stem|e37787feb96060b7|2c874bc1e63ade8d|1544a869b9d67c95|-171266073||t19619.9105141847s|a72b4e607ecebf44|222|rds|local|vector|||41.32||
@@ -62,10 +64,14 @@ load_regions|function|e17a0173e18a8b0d|||||||||||||||
 loc|object|64840534b70b690c|||||||||||||||
 make_joint_region_table|function|93410ef5b614a884|||||||||||||||
 make_joint_risk_table|function|bacd5f86be54f784|||||||||||||||
-mapped_pipeline|object|c2be8d734dc3624a|||||||||||||||
+mapped_pipeline|object|38cf9c513cb141fe|||||||||||||||
 merge_bird_boat|function|0860eedb286ddce9|||||||||||||||
 multi_taxa_hex_density|function|5be70a6b6de11cd0|||||||||||||||
-nightBarGraph|stem|bb465cb7ad9a1e5b|42235fdbd29bf388|bdedb2f1c0145bd4|1205195198||t19619.9019251232s|4bab66ba4bee4440|108|rds|local|vector|||1.4||
+nightBarGraph|stem|bb465cb7ad9a1e5b|42235fdbd29bf388|b2183d2ee001c859|1205195198||t19689.8750599932s|4bab66ba4bee4440|108|rds|local|vector|||0.42||
+nightBoxplot_aleut|stem|8ebdcf3700188b3c|893373f768ef26ae|28e16fa700d8ee03|-910221803||t19688.9869272845s|4bab66ba4bee4440|108|rds|local|vector|||0.3||
+nightBoxplot_all.ak|stem|8ebdcf3700188b3c|8ec68a9202847dda|d884f68bdd185868|-514068249||t19688.986951706s|4bab66ba4bee4440|108|rds|local|vector|||0.33||
+nightBoxplot_goa|stem|8ebdcf3700188b3c|46d886615f7cc1d4|cdfbcb63fb2ffbdb|-1754747231||t19688.9869070468s|4bab66ba4bee4440|108|rds|local|vector|||0.6||
+nightBoxplot_nbs.cs|stem|8ebdcf3700188b3c|248813c357693c0b|bd6bd90af2d023ec|1706757221||t19688.9869393849s|4bab66ba4bee4440|108|rds|local|vector|||0.31||
 obs|object|681eb41d042fdf4b|||||||||||||||
 out_risk|object|15a97c3fca9f80cc|||||||||||||||
 output_goa|stem|d131862dc333587a|cb655b395dfaa8a1|6cf0fbfb19e4534b|358392771||t19570.754588061s|44e327d1ee1978d7|43|rds|local|vector|||0||
@@ -80,20 +86,28 @@ plot_risk_categorical|function|e313fc305938e25a|||||||||||||||
 plot_risk_con|function|367c8cc2a36349cd|||||||||||||||
 plot_theme|function|32055395c34eadd5|||||||||||||||
 plot_traff|function|5f075b2befa03738|||||||||||||||
-prep_bar_graph|function|6601eb66a799dff8|||||||||||||||
+prep_bar_graph|function|4ad812442a6e2ca0|||||||||||||||
+prep_boxplot|function|f2b4069be26032d9|||||||||||||||
 prep_region_hexes|function|d40c35e73af2669d|||||||||||||||
 prep_traff|function|de256385ee75596c|||||||||||||||
 propObs|stem|e956e259a2b806ac|a5f422c5f8b254c1|f0271b80ea8a3535|-29068426||t19612.9440780913s|42453b716dfde1f4|311|rds|local|vector|||0.16|summarise_each_ was deprecated in dplyr 0.7.0.ℹ Please use across instead.ℹ The deprecated feature was likely used in the dplyr package.  Please report the issue at httpsgithub.comtidyversedplyrissues.|
 region_summary_table|function|e6f70fc8826981d6|||||||||||||||
-regionBarGraph|stem|7c3011243bc4d552|f742e67d810b876b|5a3eaeac5111cfbe|2082883496||t19619.9019437485s|241bf920421d9078|105|rds|local|vector|||1.6||
+regionBarGraph|stem|7c3011243bc4d552|f742e67d810b876b|19e7f9bab8074d6f|2082883496||t19689.8750549765s|241bf920421d9078|105|rds|local|vector|||0.48||
+regionBoxPlot|stem|a64d4a15336e4173|09865f7aef4e8e4e|c313805e19ae3515|212150304||t19689.8761761437s|9935591c0ed1d478|103|rds|local|vector|||0.78||
+regionBoxPlot_aleut|stem|error|fd678c111b0c1f46|3043d80db58374ae|-587166075||t19688.9814340745s|44e327d1ee1978d7|43|rds|local|vector|||0.28||Problem while computing aesthetics.ℹ Error occurred in the 1st layer.Caused by error object risk_cont not found
+regionBoxPlot_all.ak|stem|error|fd678c111b0c1f46|3043d80db58374ae|1135991821||t19688.9814308034s|44e327d1ee1978d7|43|rds|local|vector|||0.33||Problem while computing aesthetics.ℹ Error occurred in the 1st layer.Caused by error object risk_cont not found
+regionBoxPlot_goa|stem|error|fd678c111b0c1f46|3043d80db58374ae|1900533491||t19688.9814268574s|44e327d1ee1978d7|43|rds|local|vector|||0.38||Problem while computing aesthetics.ℹ Error occurred in the 1st layer.Caused by error object risk_cont not found
+regionBoxPlot_nbs.cs|stem|error|fd678c111b0c1f46|3043d80db58374ae|-2140301673||t19688.9814374619s|44e327d1ee1978d7|43|rds|local|vector|||0.27||Problem while computing aesthetics.ℹ Error occurred in the 1st layer.Caused by error object risk_cont not found
 regions|object|a457b8ad0b199241|||||||||||||||
 regionSummary_aleut|stem|0c52584e5b2f5364|8f20b50212ff3b0a|cfeead61d263c497|167777090||t19619.9013613423s|2bff303c02f1cf66|379|rds|local|vector|||0.08||
 regionSummary_all.ak|stem|5795181d9d74399d|076d1ec53262c61c|1adca6abad62644d|-111404407||t19613.9119054382s|81f13fa29326ae4b|381|rds|local|vector|||0.06||
 regionSummary_goa|stem|27e375a46e582042|b8e6633623e11815|4933924377f147a3|1721763488||t19613.9119037721s|c4c272a184f75d8c|382|rds|local|vector|||0.14||
 regionSummary_nbs.cs|stem|809d9a0d33f80fe9|166874585cbaf4af|889017614d1673c9|-1493110397||t19613.9119080638s|86602595fcf9510b|397|rds|local|vector|||0.08||
-risk_bar_graph_night|function|db934e04c8039362|||||||||||||||
-risk_bar_graph_tod|function|876fe7938919b2de|||||||||||||||
+risk_bar_graph_night|function|9a9df616d67ab7ed|||||||||||||||
+risk_bar_graph_tod|function|4a358a84f0eb59af|||||||||||||||
 risk_boxplot|function|88d7087a562c59e4|||||||||||||||
+risk_boxplot_night|function|01fabe7cb72f0725|||||||||||||||
+risk_boxplot_tod|function|f8e11a3c5856e128|||||||||||||||
 risk_cat_plot|function|c01b7025686b3f6e|||||||||||||||
 risk_con_plot|function|c9482d3eb42c9641|||||||||||||||
 risk_subset|function|19310dd38cea9720|||||||||||||||
@@ -108,7 +122,7 @@ riskSummary_all.ak|stem|a565849623b665e1|accc570164dfe1de|9317bcc8f7c7dbf0|-4120
 riskSummary_goa|stem|6514e3ddbce2d0cd|31334b8279d75a2e|aabe7d7e6016b1b5|1874304760||t19613.9119044533s|8b534963f5486e20|1135|rds|local|vector|||0.03||
 riskSummary_nbs.cs|stem|38462951e1cca875|a670c4baaf31ac9c|1b7c5d53ac6f987b|2020294959||t19613.911906986s|caaf1695eda09c20|1142|rds|local|vector|||0.04||
 save_combo_plot|function|ef4e876c46d213cb|||||||||||||||
-scripts|object|4c53f0c569d7771a|||||||||||||||
+scripts|object|6b24ccfdf95bb9b1|||||||||||||||
 shpfiles_aleut|stem|2abf83a7a2a39934|9698fab82667573e|595dc8b4e2941673|23175980||t19576.6686712782s|ec25f5b8662e3d87|1069|rds|local|vector|||0.05||
 shpfiles_all.ak|stem|bbed6e025719d59a|8496a7d6f790a01c|595dc8b4e2941673|1137900755||t19576.6724016722s|207a6ca4f5410eed|2003|rds|local|vector|||0.01||
 shpfiles_goa|stem|2276998caca2d646|b472d4641e60147b|595dc8b4e2941673|1138145489||t19576.6686720072s|4efd5d5027a77bce|1057|rds|local|vector|||0.03||
@@ -127,10 +141,14 @@ studyTransects|stem|6665d0440370325a|2c290c119a3b0549|0a6b3f62a0f0c2c3|188842013
 studyTransects_goa|stem|error|bb495ae53e0558fc|7f9a05cbceaad24a|1717053996||t19570.7795325231s|44e327d1ee1978d7|43|rds|local|vector|||1.36||unused arguments studyArea  KodiakPWS.shp, studyAreaName  goa
 studyTransects_nbs.cs|stem|error|6b5a890524977f0a|7f9a05cbceaad24a|-895844636||t19570.7795330989s|44e327d1ee1978d7|43|rds|local|vector|||0.01||unused arguments studyArea  BerChukBeau.shp, studyAreaName  nbscs
 studyTransects_nbs_cs|stem|error|45fdcfb5ee93b077|48a07a13b79f8893|109607260||t19570.760639842s|44e327d1ee1978d7|43|rds|local|vector|||0.02||unused arguments studyArea  BerChukBeau.shp, studyAreaName  nbs_cs
-taxaBarGraph_aleut|stem|c45e52517865d6ac|b5b572351caa827e|60bcf88c88bd5e0c|-573780219||t19619.9019075969s|9903306e1685fb67|94|rds|local|vector|||2.04||
-taxaBarGraph_all.ak|stem|b17bdf6cda4787ba|aee662319571de5e|ef61acdd31c59301|-831887306||t19613.9138002337s|dfd0d40dc0c5171b|95|rds|local|vector|||1.05||
-taxaBarGraph_goa|stem|4924a4466b0f3032|5748c6ec45a74440|0ae6f4eb1b87fe56|2123343327||t19613.9126533798s|8fcb0666863d3c08|92|rds|local|vector|||1.09||
-taxaBarGraph_nbs.cs|stem|948f1631313043f8|9cc02339fb55f226|c2065130bec9f009|-1873788006||t19613.9147237074s|dfd0d40dc0c5171b|95|rds|local|vector|||0.6||
+taxaBarGraph_aleut|stem|c45e52517865d6ac|b5b572351caa827e|64f1e70989c2b0cb|-573780219||t19689.8750355607s|9903306e1685fb67|94|rds|local|vector|||0.61||
+taxaBarGraph_all.ak|stem|b17bdf6cda4787ba|aee662319571de5e|96a6c3eb4df97a6a|-831887306||t19689.8750492529s|dfd0d40dc0c5171b|95|rds|local|vector|||0.63||
+taxaBarGraph_goa|stem|4924a4466b0f3032|5748c6ec45a74440|390b0c2fd325062b|2123343327||t19689.8750419496s|8fcb0666863d3c08|92|rds|local|vector|||0.53||
+taxaBarGraph_nbs.cs|stem|948f1631313043f8|9cc02339fb55f226|8a5eb29e0a42de91|-1873788006||t19689.8750284101s|dfd0d40dc0c5171b|95|rds|local|vector|||1||
+taxaBoxPlot_aleut|stem|8157b82f8cdfaa41|e8117b9ae293f7a1|bc7148f7e904c136|-714207907||t19689.8768389521s|8fcb0666863d3c08|92|rds|local|vector|||0.68||
+taxaBoxPlot_all.ak|stem|87eccd28fe42ab5e|d1cb61cf3ac426e9|02d6b23ac9dbba2a|-243067121||t19689.8768567174s|17e1813002340629|93|rds|local|vector|||0.77||
+taxaBoxPlot_goa|stem|239ba78b44503338|0789d9689040e509|01eef8a84454d168|363546222||t19689.8768472265s|a3c4b57a6f0085ec|90|rds|local|vector|||0.71||
+taxaBoxPlot_nbs.cs|stem|99132ed3f5bf8ccf|40a99d0b21a032e0|a46a7b465384cb04|-1978928117||t19689.8768307948s|17e1813002340629|93|rds|local|vector|||0.9||
 test|stem|d131862dc333587a|c729228cfd66038a|3221a877a7c214e4|1064684737||t19612.9440790582s|44e327d1ee1978d7|43|rds|local|vector|||0.06||
 testfunc|function|d9974245e933b476|||||||||||||||
 traff_plot|function|b20c51f84906b407|||||||||||||||

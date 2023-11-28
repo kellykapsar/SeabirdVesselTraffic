@@ -145,11 +145,17 @@ mapped_pipeline <- tar_map(
                                             hex = studyHexes, 
                                             region_title = title)),
   
+  # Create boxplots of risk index values by region/taxa/time of day
+  tar_target(taxaBoxPlot, 
+             command = boxplot_taxa(nestDf = riskDfs,
+                                    region_name = name)), 
+  tar_target(nightBoxplot, 
+             command = risk_boxplot_night(nestDf = riskDfs)),
+  
   # Create table of summary statistics for risk in a given region 
   tar_target(riskSummary, 
              command = risk_summary_table(nestDf = riskDfs, 
                                           region_title = title)), 
-  
   tar_target(taxaBarGraph, 
              command = bar_graph_taxa(df = riskSummary,
                                       region_name = name)), 
@@ -182,9 +188,10 @@ out_study <- tar_combine(allBoxes,
 
 combined_summaries <- list(tar_target(regionBarGraph,
                                       command = bar_graph_regions(df = allRisk)), 
-                           
                            tar_target(nightBarGraph, 
                                       command = risk_bar_graph_night(df = allRisk)),
+                           tar_target(regionBoxPlot,
+                                        command = boxplot_regions(nestDf = fullRisk)),
                            tar_target(allRiskTable, 
                                       command = make_joint_risk_table(df = allRisk)), 
                            tar_target(allRegionTable, 
