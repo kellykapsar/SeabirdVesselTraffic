@@ -5,15 +5,14 @@
 #'
 #' @param df Data frame containing bird and vessel traffic data .
 #' @param shpfile Shapefile containing geometries and hex_ids of hexes with sufficient survey effort in a given region
-#' @param region_name Name of the region being analyzed.
 #' @return A data frame containing risk level calculations.
-calculate_risk <- function(df, shpfile, region_name){
+calculate_risk <- function(df, shpfile){
   
   # Excluded hexes outside of study area 
   dfnew <- df[df$hex_id %in% shpfile$hex_id,]
   
   birdCols <- colnames(dfnew)[!(colnames(dfnew) %in% 
-                                  c("hex_id", "season", "n_transects", "sample_area", "hrs_al", "d_hrs_al", "n_hrs_al"))]
+      c("hex_id", "season", "n_transects", "sample_area", "hrs_al", "d_hrs_al", "n_hrs_al"))]
   
   # Remove number of bird observations column from future analyses (only density values used)
   birdCols <- birdCols[grep("n_birds", birdCols, invert = TRUE)]
@@ -27,7 +26,7 @@ calculate_risk <- function(df, shpfile, region_name){
   for(i in 1:length(vars$bird)){
     birdCol <- vars$bird[i]
     shipCol <- vars$ship[i]
-    temp <- risk_subset(dfnew, birdCol, shipCol, region_name)
+    temp <- risk_subset(dfnew, birdCol, shipCol)
     nestDf <- rbind(nestDf, temp)
     rm(temp)
   }
@@ -43,9 +42,8 @@ calculate_risk <- function(df, shpfile, region_name){
 #' @param df Data frame containing bird and vessel traffic data.
 #' @param birdCol Column name containing density for a particular taxa group.
 #' @param shipCol Column name containing vessel activity metric.
-#' @param region_name Name of the region being analyzed.
 #' @return A data frame containing calculated risk subset.
-risk_subset <- function(df, birdCol, shipCol, region_name){
+risk_subset <- function(df, birdCol, shipCol){
   
   oneBird <- df %>% 
     select(hex_id, season, all_of({{birdCol}}), all_of({{shipCol}})) %>% 
@@ -95,8 +93,7 @@ risk_subset <- function(df, birdCol, shipCol, region_name){
   
   filename <- paste0("./data_processed/risk-calcs_", 
                      sub("_", "-", {{birdCol}}), "_", 
-                     sub("_", "-", {{shipCol}}), "_", 
-                     sub("_", "-", region_name), ".csv")
+                     sub("_", "-", {{shipCol}}), ".csv")
   
   if(!file.exists("./data_processed")){
     dir.create("./data_processed")
@@ -106,13 +103,35 @@ risk_subset <- function(df, birdCol, shipCol, region_name){
   
   oneBird$taxa <- as.character({{birdCol}})
   oneBird$traff <- as.character({{shipCol}})
-  oneBird$region <- region_name
   
-  t <- oneBird %>% dplyr::select(hex_id, season, taxa, region, traff, density, traff_hrs, risk_cat, risk_cont)
-  tnew <- t %>% group_by(season, region, taxa, traff) %>% nest()
+  t <- oneBird %>% dplyr::select(hex_id, season, taxa, traff, density, traff_hrs, risk_cat, risk_cont)
+  tnew <- t %>% group_by(season, taxa, traff) %>% nest()
   return(tnew)
 }
 
+
+#' Calculate risk levels based on density and vessel traffic.
+#'
+#' This function calculates risk levels for all combinations of unique taxa groups and vessel activity metrics 
+#' within a given region. 
+#'
+#' @param riskDf Data frame containing bird, vessel traffic, and risk data (output of calculate_risk)
+#' @param shpfile Shapefile containing geometries and hex_ids of hexes with sufficient survey effort in a given region
+#' @param region_name Name of the region being analyzed.
+#' @return A data frame containing risk level calculations.
+generate_region_risk_subset <- function(riskDf, shpfile, region_name){
+
+  dfnew <- riskDf %>%     
+    ungroup() %>% 
+    mutate(summernew = map(summer, ~.x[.x$hex_id %in% shpfile$hex_id,]),
+           fallnew = map(fall, ~.x[.x$hex_id %in% shpfile$hex_id,]), 
+           region = region_name) %>%
+    select(-summer, -fall) %>%
+    rename(summer = summernew,
+           fall = fallnew)
+  
+  return(dfnew)
+}
 #' Prepare region hexagons.
 #'
 #' This function isolates hexes within a given region that have sufficient survey effort for inclusion in the study. 

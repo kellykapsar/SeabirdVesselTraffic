@@ -32,7 +32,6 @@ obs <- read.csv("./data_raw/NPPSD_v4.0/Observations_NPPSDv4.csv")
 # Vessel traffic data
 traffDat <- read.csv("./data_processed/traffic_data/traffic_clean.csv")
 
-
 # Specify regional subets and taxa groups for analysis  ------------------------
 regions <- data.frame(
   study_area = c("AllAlaska.shp", "BerChukBeau.shp", "KodiakPWS.shp", "Unimak.shp"),
@@ -47,7 +46,8 @@ allSpp <- read.csv("./data_raw/NPPSD_Bird_Codes_Only_Revised.csv")
 
 # Initial data cleaning and organization targets -------------------------------
 
-inits <- list(
+inits <-
+list(
   
   # Aggregate traffic data 
   tar_target(traffDat, 
@@ -73,134 +73,142 @@ inits <- list(
              command = focal_taxa_pct_obs(fullDf)),
   
   # Save data frame
-  tar_target(test,
+  tar_target(save_csv,
              command = write.csv(fullDf,
                                  file = "./data_processed/full_df.csv",
-                                 row.names = FALSE))
+                                 row.names = FALSE)),
+  
+  tar_target(studyHexes_master, 
+             command = prep_region_hexes("AllAlaska.shp", hex, fullDf)),
+  
+  # Calculate categorical and continuous risk values
+  tar_target(riskDfMaster,
+             command = calculate_risk(df = fullDf,
+                                      shpfile = studyHexes_master))
   )
 
 
-# Mapped pipeline applies each target to each region ---------------------------
-mapped_pipeline <- tar_map(
+# # Mapped pipeline applies each target to each region ---------------------------
+mapped_pipeline <-
+tar_map(
   values = regions,
   names = "name",
   unlist = FALSE,
   
   # Isolate hexes from region with sufficient survey effort
-  tar_target(studyHexes, 
+  tar_target(studyHexes,
              command = prep_region_hexes(study_area, hex, fullDf)),
-  
-  # Calculate categorical and continuous risk values 
+
+  # Subset riskDfs_master for each study region (risk values do not change)
   tar_target(riskDfs, 
-             command = calculate_risk(df = fullDf, 
-                                      shpfile = studyHexes, 
-                                      region_name = name)), 
+             command = generate_region_risk_subset(riskDf = riskDfMaster, 
+                                                   shpfile = studyHexes, 
+                                                   region_name = name)),  
   
   # Create bounding box for plotting
-  tar_target(box, 
+  tar_target(box,
              command = st_as_sf(st_buffer(st_as_sfc(st_bbox(studyHexes)), 10000),
              name = name)),
-  
+
   # Crop basemape to region for plotting
-  tar_target(basemapnew, 
-             command = st_crop(x = basemap, 
+  tar_target(basemapnew,
+             command = st_crop(x = basemap,
                                y = box)),
-  
-  # Create and save categorical risk maps 
-  tar_target(catPlots, 
-             command = plot_risk_cat(nestDf = riskDfs, 
-                                     region_name = name, 
-                                     hex = studyHexes, 
-                                     basemap = basemapnew, 
-                                     box = box)), 
-  
-  # Create and save continuous risk maps 
-  tar_target(conPlots, 
-             command = plot_risk_con(nestDf = riskDfs, 
-                                     region_name = name, 
-                                     hex = studyHexes, 
-                                     basemap = basemapnew, 
-                                     box = box)), 
-  
-  # Create and save seabird density  maps 
-  tar_target(birdPlots, 
-             command = plot_bird(nestDf = riskDfs, 
-                                  region_name = name, 
-                                  hex = studyHexes, 
-                                  basemap = basemapnew, 
-                                  box = box)), 
-  
-  # Create and save vessel traffic  maps 
-  tar_target(traffPlots, 
-             command = plot_traff(nestDf = riskDfs, 
-                                  region_name = name, 
-                                  hex = studyHexes, 
-                                  basemap = basemapnew, 
-                                  box = box)), 
-  
-  # Create table of summary statistics for a region 
-  tar_target(regionSummary, 
+
+  # Create and save categorical risk maps
+  tar_target(catPlots,
+             command = plot_risk_cat(nestDf = riskDfs,
+                                     region_name = name,
+                                     hex = studyHexes,
+                                     basemap = basemapnew,
+                                     box = box)),
+
+  # Create and save continuous risk maps
+  tar_target(conPlots,
+             command = plot_risk_con(nestDf = riskDfs,
+                                     region_name = name,
+                                     hex = studyHexes,
+                                     basemap = basemapnew,
+                                     box = box)),
+
+  # Create and save seabird density  maps
+  tar_target(birdPlots,
+             command = plot_bird(nestDf = riskDfs,
+                                  region_name = name,
+                                  hex = studyHexes,
+                                  basemap = basemapnew,
+                                  box = box)),
+
+  # Create and save vessel traffic  maps
+  tar_target(traffPlots,
+             command = plot_traff(nestDf = riskDfs,
+                                  region_name = name,
+                                  hex = studyHexes,
+                                  basemap = basemapnew,
+                                  box = box)),
+
+  # Create table of summary statistics for a region
+  tar_target(regionSummary,
              command = region_summary_table(fullDf = fullDf,
                                             nestDf = riskDfs,
-                                            hex = studyHexes, 
+                                            hex = studyHexes,
                                             region_title = title)),
-  
+
   # Create boxplots of risk index values by region/taxa/time of day
-  tar_target(taxaBoxPlot, 
+  tar_target(taxaBoxPlot,
              command = boxplot_taxa(nestDf = riskDfs,
-                                    region_name = name)), 
-  tar_target(nightBoxplot, 
+                                    region_name = name)),
+  tar_target(nightBoxplot,
              command = risk_boxplot_night(nestDf = riskDfs)),
-  
-  # Create table of summary statistics for risk in a given region 
-  tar_target(riskSummary, 
-             command = risk_summary_table(nestDf = riskDfs, 
-                                          region_title = title)), 
-  tar_target(taxaBarGraph, 
+
+  # Create table of summary statistics for risk in a given region
+  tar_target(riskSummary,
+             command = risk_summary_table(nestDf = riskDfs,
+                                          region_title = title)),
+  tar_target(taxaBarGraph,
              command = bar_graph_taxa(df = riskSummary,
-                                      region_name = name)), 
-  tar_target(jointRiskMap, 
-             command = plot_joint_high_risk(nestDf = riskDfs, 
-                                            region_name = name, 
-                                            hex = studyHexes, 
-                                            basemap = basemapnew, 
-                                            box = box))) 
+                                      region_name = name)),
+  tar_target(jointRiskMap,
+             command = plot_joint_high_risk(nestDf = riskDfs,
+                                            region_name = name,
+                                            hex = studyHexes,
+                                            basemap = basemapnew,
+                                            box = box)))
 
 # Combine regional results  ----------------------------------------------------
 
 # Combine regional summary tables into master table
-out_regions <- tar_combine(allRegions, 
-                           mapped_pipeline[["regionSummary"]], 
+out_regions <- tar_combine(allRegions,
+                           mapped_pipeline[["regionSummary"]],
                            command=bind_rows(!!!.x))
 
 # Combine risk summary tables into master table
-out_risk <- list(tar_combine(allRisk, 
-                        mapped_pipeline[["riskSummary"]], 
-                        command=bind_rows(!!!.x)), 
-            tar_combine(fullRisk, 
-                        mapped_pipeline[["riskDfs"]], 
+out_risk <- list(tar_combine(allRisk,
+                        mapped_pipeline[["riskSummary"]],
+                        command=bind_rows(!!!.x)),
+            tar_combine(fullRisk,
+                        mapped_pipeline[["riskDfs"]],
                         command=bind_rows(!!!.x)))
 
 # Create master sf object with all study area bounding boxes
-out_study <- tar_combine(allBoxes, 
-                        mapped_pipeline[["box"]], 
+out_study <- tar_combine(allBoxes,
+                        mapped_pipeline[["box"]],
                         command=bind_rows(!!!.x))
 
 combined_summaries <- list(tar_target(regionBarGraph,
-                                      command = bar_graph_regions(df = allRisk)), 
-                           tar_target(nightBarGraph, 
+                                      command = bar_graph_regions(df = allRisk)),
+                           tar_target(nightBarGraph,
                                       command = risk_bar_graph_night(df = allRisk)),
                            tar_target(regionBoxPlot,
                                         command = boxplot_regions(nestDf = fullRisk)),
-                           tar_target(allRiskTable, 
-                                      command = make_joint_risk_table(df = allRisk)), 
-                           tar_target(allRegionTable, 
+                           tar_target(allRiskTable,
+                                      command = make_joint_risk_table(df = allRisk)),
+                           tar_target(allRegionTable,
                                       command = make_joint_region_table(df = allRegions))
 )
 
 # Join targets into master list  ----------------------------------------------
 list(inits, mapped_pipeline, out_regions, out_risk, out_study, combined_summaries)
-
 
 
 ################################################################################
