@@ -130,7 +130,6 @@ plot_traff <- function(nestDf, region_name, hex, basemap, box){
   
 }
 
-
 #' Plot vessel traffic.
 #'
 #' This function plots vessel traffic for a given data frame.
@@ -152,11 +151,7 @@ traff_plot <- function(df, region_name, hex, title, basemap, box){
     lims <- c(0,50000)
   }
   
-  dfSf <- hex %>% filter(hex_id %in% unique(df$hex_id)) %>% left_join(df, by="hex_id")
-
-  if(!file.exists(paste0("./data_processed/StudyAreaHexes_", region_name, ".shp"))){
-    st_write(dfSf, paste0("./data_processed/StudyAreaHexes_", region_name, ".shp"))
-  }
+  dfSf <- hex %>% dplyr::filter(hex_id %in% unique(df$hex_id)) %>% left_join(df, by="hex_id")
   
   pltEmpty <- plot_empty(basemap, box)
   plt <- pltEmpty  + 
@@ -166,7 +161,8 @@ traff_plot <- function(df, region_name, hex, title, basemap, box){
     
     geom_sf(data=dfSf, aes(fill = traff_hrs), color="darkgray") +
     scale_fill_viridis_c(option = "H", direction=1, trans="pseudo_log", breaks=br,
-                         labels=scales::label_comma(),name="Vessel Activity\n(Hours)", na.value="white", limits=lims) +
+                         labels=scales::label_comma(),name="Vessel Activity\n(Hours)", 
+                         na.value="white", limits=lims) +
 
     guides(fill = guide_colourbar(barwidth = 1, 
                                   barheight = 15, 
@@ -459,5 +455,27 @@ joint_high_risk_plot <- function(df, hex, title, basemap, box){
                       name="Number of Taxa Groups", 
                       drop=F)
   return(plt)
+}
+
+save_spatial_data <- function(df, hex){
+  
+  # Save summer data 
+  dfSumm <- df %>% filter(season == "summer")
+  
+  dfSummSf <- hex %>% 
+    dplyr::filter(hex_id %in% unique(dfSumm$hex_id)) %>% 
+    left_join(dfSumm, by="hex_id")
+  
+  st_write(dfSummSf, "./data_processed/StudyAreaHexes_summer_all-ak.shp")
+  
+  # Save fall data 
+  dfFall <- df %>% filter(season == "fall")
+  
+  dfFallSf <- hex %>% 
+    dplyr::filter(hex_id %in% unique(dfFall$hex_id)) %>% 
+    left_join(dfFall, by="hex_id")
+  
+  st_write(dfFallSf, "./data_processed/StudyAreaHexes_fall_all-ak.shp")
+  
 }
 
