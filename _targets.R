@@ -78,6 +78,11 @@ list(
                                  file = "./data_processed/full_df.csv",
                                  row.names = FALSE)),
   
+  # Save spatial version of df
+  tar_target(outShp,
+             command = save_spatial_data(df = fullDf, 
+                                         hex = hex)),
+  
   tar_target(studyHexes_master, 
              command = prep_region_hexes("AllAlaska.shp", hex, fullDf)),
   
