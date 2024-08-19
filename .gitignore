@@ -5,3 +5,12 @@
 data_raw/
 data_processed/
 figures/
+manuscript/
+peer_review/
+notes/
+presentations/
+products/
+submission_materials/
+.backups/
+figures_focal_region_specific_risk/
+data_processed_focal_region_specific_risk/
